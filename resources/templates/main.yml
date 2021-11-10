@@ -1,0 +1,149 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: SwitchPlus Main Template
+
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switch-plus.com
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+
+  BasicUser:
+    Type: String
+    Default: switch-plus
+
+  BasicPass:
+    NoEcho: true
+    Type: String
+    Default: switch-plus0401
+
+  CloudFrontS3DomainName:
+    Type: String
+    Default: stg-imedia-cms.s3.amazonaws.com
+
+  DatabaseName:
+    Type: String
+    MinLength: 4
+    MaxLength: 12
+    Default: switch_plus
+
+  MasterUsername:
+    Type: String
+    MinLength: 8
+    MaxLength: 10
+    Default: switchplus
+
+  MasterUserPassword:
+    NoEcho: true
+    Type: String
+    MinLength: 10
+    MaxLength: 12
+    Default: switch-plus0401
+
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.small
+    AllowdValues:
+      - db.t3.small
+      - db.t3.medium
+
+Resources:
+
+  SSMParamServiceName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /SwitchPlus/Name
+      Value: !Ref ServiceName
+
+  SSMParamEnv:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /SwitchPlus/Env
+      Value: !Ref Env
+
+  SSMParamBasicUser:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /SwitchPlus/BasicUser
+      Value: !Ref BasicUser
+
+  SSMParamBasicPass:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /SwitchPlus/BasicPass
+      Value: !Ref BasicPass
+
+  SSMParamCloudFrontS3DomainName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /SwitchPlus/CloudFrontS3DomainName
+      Value: !Ref CloudFrontS3DomainName
+
+  SSMParamDatabaseName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /SwitchPlus/DatabaseName
+      Value: !Ref DatabaseName
+
+  SSMParamMasterUsername:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /SwitchPlus/MasterUsername
+      Value: !Ref MasterUsername
+
+  SSMParamMasterUserPassword:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /SwitchPlus/MasterUserPassword
+      Value: !Ref MasterUserPassword
+
+  SSMParamDBInstanceClass:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /SwitchPlus/DBInstanceClass
+      Value: !Ref DBInstanceClass
+
+
+  Network:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://imedia-cloudformation.s3.ap-northeast-1.amazonaws.com/cloudformation/templates/network.yml
+
+  Security:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: Network
+    Properties:
+      TemplateURL: https://imedia-cloudformation.s3.ap-northeast-1.amazonaws.com/cloudformation/templates/securities/security_group.yml
+
+  Cloudfront:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://imedia-cloudformation.s3.ap-northeast-1.amazonaws.com/cloudformation/templates/applications/cloudfront.yml
+
+  DB:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: [Network, Security]
+    Properties: 
+      TemplateURL: https://imedia-cloudformation.s3.ap-northeast-1.amazonaws.com/cloudformation/templates/applications/db.yml
+
+  ECS:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: [Network, Security]
+    Properties: 
+      TemplateURL: https://imedia-cloudformation.s3.ap-northeast-1.amazonaws.com/cloudformation/templates/resources/ecs.yml
+
+

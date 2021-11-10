@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CloudFront Template in Application Layer
+
+Resources:
+
+  ##### CloudFront Distribution の作成 #####
+  distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: content distribution
+        Enabled: true
+        IPV6Enabled: false
+        Origins:
+          - Id: S3Origin
+            DomainName: '{{resolve:ssm:/SwitchPlus/CloudFrontS3DomainName}}' 
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ForwardedValues:
+            QueryString: false
+          ViewerProtocolPolicy: redirect-to-https
+          FunctionAssociations:
+            # CFへのリクエスト時にBasic認証をおこなう
+            - EventType: viewer-request
+              FunctionARN:
+                Fn::GetAtt:
+                  - BasicAuthCloudFrontFunction
+                  - FunctionARN
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+            # CloudFrontDefaultCertificate: !If [IsProd, false, true]
+            # SslSupportMethod: 'sni-only'
+            # AcmCertificateArn: !If [IsProd, !Sub 'arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/${SSLCertificateId}', '']
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-distribution'
+
+
+  ##### CloudFrontからS3への OriginAccessIdentity の作成 #####
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: S3Origin
+
+
+  ##### CloudFrontDistributionに対する Functionの作成 (ステージング環境のみ) #####
+  BasicAuthCloudFrontFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      AutoPublish: true
+      FunctionCode:
+        Fn::Sub: |
+          function handler(event) {
+            var request = event.request;
+            var headers = request.headers;
+
+            var authUser = '{{resolve:ssm:/SwitchPlus/BasicUser}}';
+            var authPass = '{{resolve:ssm:/SwitchPlus/BasicPass}}';
+            var tmp = authUser + ':' + authPass;
+            var authString = 'Basic ' + tmp.toString('base64');
+
+            if (
+              typeof headers.authorization === "undefined" ||
+              headers.authorization.value !== authString
+            ) {
+              return {
+                statusCode: 401,
+                statusDescription: "Unauthorized",
+                headers: { "www-authenticate": { value: "Basic" } }
+              };
+            }
+
+            return request;
+          }
+      FunctionConfig:
+        Comment: basic authentication to stg-s3
+        Runtime: cloudfront-js-1.0
+      Name: basic-authentication

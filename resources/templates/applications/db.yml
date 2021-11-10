@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Database Template in Application Layer
+
+Resources:
+  DBCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora-mysql
+      EngineVersion: 5.7.mysql_aurora.2.10.1
+      EngineMode: provisioned
+      DBClusterIdentifier: stg-imedia-cluster
+        # DBClusterParameterGroupName: aurora-mysql5.7 
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      DatabaseName: '{{resolve:ssm:/SwitchPlus/DatabaseName}}'
+      DeletionProtection: false
+      MasterUsername: '{{resolve:ssm:/SwitchPlus/MasterUsername}}'
+      MasterUserPassword: '{{resolve:ssm:/SwitchPlus/MasterUserPassword}}'
+      Port: 3306
+      VpcSecurityGroupIds:
+        - !ImportValue SecGroupDb
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-db-cluster'
+
+
+  DBInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      DBClusterIdentifier: !Ref DBCluster
+      Engine: aurora-mysql
+      DBInstanceClass: '{{resolve:ssm:/SwitchPlus/DBInstanceClass}}'
+      DBInstanceIdentifier: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-db'
+      DBParameterGroupName: !Ref DBParameterGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-db'
+
+  DBParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: Staging Imedia DB Parameter Group
+      Family: aurora-mysql5.7
+      Parameters:
+        max_allowed_packet: 1024
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-db-parameter-group'
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription:  Staging Imedia DB Subnet Group
+      SubnetIds:
+        - !ImportValue DBPrivateSubnetA
+        - !ImportValue DBPrivateSubnetB
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-db-subnet-group'
+
+

@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: SecurityGroup in Security Layer
+
+Resources: 
+  EcsSecurityGroupBefore:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-ecs-secgroup-before'
+      GroupDescription: security group for ecs
+      VpcId: !ImportValue VpcId
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-ecs-secgroup-before'
+
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: EcsSecurityGroupBefore
+    Properties:
+      GroupName: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-db-secgroup'
+      GroupDescription: security group for db
+      VpcId: !ImportValue VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref EcsSecurityGroupBefore
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-db-secgroup'
+
+  EcsSecurityGroupAfter:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: [DBSecurityGroup, EcsSecurityGroupBefore]
+    Properties:
+      GroupName: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-ecs-secgroup-after'
+      GroupDescription: security group for ecs
+      VpcId: !ImportValue VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          DestinationSecurityGroupId: !Ref DBSecurityGroup
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-ecs-secgroup-after'
+
+
+  AlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: EcsSecurityGroupAfter
+    Properties:
+      GroupName: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-alb-secgroup'
+      GroupDescription: security group for alb
+      VpcId: !ImportValue VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          DestinationSecurityGroupId: !Ref EcsSecurityGroupAfter
+        - IpProtocol: tcp
+          FromPort: 443 
+          ToPort: 443
+          DestinationSecurityGroupId: !Ref EcsSecurityGroupAfter
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-alb-secgroup'
+            # 恐らく不要
+            #         - IpProtocol: tcp
+            #           FromPort: 80
+            #           ToPort: 80
+            #           CidrIp: 0.0.0.0/0
+            #         - IpProtocol: tcp
+            #           FromPort: 443
+            #           ToPort: 443
+            #           CidrIp: 0.0.0.0/0
+
+
+Outputs:
+  SecGroupECS:
+    Value: !Ref EcsSecurityGroupAfter
+    Export:
+      Name: SecGroupECS
+  SecGroupDb:
+    Value: !Ref DBSecurityGroup
+    Export:
+      Name: SecGroupDb
+  SecGroupAlb:
+    Value: !Ref AlbSecurityGroup
+    Export:
+      Name: SecGroupAlb
+

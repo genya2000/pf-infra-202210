@@ -1,0 +1,243 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Network Layer Template
+
+Resources:
+  #####  VPCの作成 #####
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-vpc'
+
+  ##### インターネットゲートウェイの作成 #####
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-igw'
+
+  ##### インターネットゲートウェイをVPCにアタッチ #####
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId: !Ref InternetGateway
+
+
+  ##### サブネットの作成 #####
+  DBPrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+         - 0
+         - Fn::GetAZs: !Ref AWS::Region
+      VpcId: !Ref Vpc
+      CidrBlock: 10.0.5.0/24
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-db-private-subnet-A'
+  DBPrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+         - 1
+         - Fn::GetAZs: !Ref AWS::Region
+      VpcId: !Ref Vpc
+      CidrBlock: 10.0.6.0/24
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-db-private-subnet-B'
+
+  ECSPrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+         - 0
+         - Fn::GetAZs: !Ref AWS::Region
+      VpcId: !Ref Vpc
+      CidrBlock: 10.0.7.0/24
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-ecs-private-subnet-A'
+
+  ECSPrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+         - 1
+         - Fn::GetAZs: !Ref AWS::Region
+      VpcId: !Ref Vpc
+      CidrBlock: 10.0.8.0/24
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-ecs-private-subnet-B'
+
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+         - 0
+         - Fn::GetAZs: !Ref AWS::Region
+      VpcId: !Ref Vpc
+      CidrBlock: 10.0.9.0/24
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-public-subnet-A'
+
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+         - 1
+         - Fn::GetAZs: !Ref AWS::Region
+      VpcId: !Ref Vpc
+      CidrBlock: 10.0.10.0/24
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-public-subnet-B'
+
+
+  ##### ルートテーブルの作成 #####
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-private-routetable' 
+
+  PublicRouteTableA:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-public-routetable-A' 
+
+  PublicRouteTableB:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-public-routetable-B' 
+
+
+  ##### インターネットゲートウェイルートの作成 #####
+  PublicRouteA:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTableA
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicRouteB:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTableB
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+
+  ##### サブネットをルートテーブルに関連付け #####
+  RouteTableAssocDBPrivateSubnetA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref DBPrivateSubnetA
+      RouteTableId: !Ref PrivateRouteTable
+
+  RouteTableAssocDBPrivateSubnetB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref DBPrivateSubnetB
+      RouteTableId: !Ref PrivateRouteTable
+
+  RouteTableAssocECSPrivateSubnetA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref ECSPrivateSubnetA
+      RouteTableId: !Ref PrivateRouteTable
+
+  RouteTableAssocECSPrivateSubnetB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref ECSPrivateSubnetB
+      RouteTableId: !Ref PrivateRouteTable
+
+  RouteTableAssocPublicSubnetA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetA
+      RouteTableId: !Ref PublicRouteTableA
+
+  RouteTableAssocPublicSubnetB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetB
+      RouteTableId: !Ref PublicRouteTableB
+
+
+  ##### NAGゲートウェイ用EIPの作成 #####
+  EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachGateway
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: stg-imedia-eip
+
+
+  ##### NATゲートウェイの作成 #####
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    DependsOn: EIP
+    Properties:
+      AllocationId: !GetAtt EIP.AllocationId
+      SubnetId: !Ref PublicSubnetA
+      Tags:
+        - Key: Name
+          Value: stg-imedia-nat
+
+
+  ##### NATゲートウェイルートを作成 #####
+  NatGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+      RouteTableId: !Ref PrivateRouteTable
+
+Outputs:
+  VpcId:
+    Value: !Ref Vpc
+    Export:
+      Name: VpcId
+  DBPrivateSubnetA:
+    Value: !Ref DBPrivateSubnetA
+    Export:
+      Name: PrivateSubnetDB1
+  DBPrivateSubnetB:
+    Value: !Ref DBPrivateSubnetB
+    Export:
+      Name: DBPrivateSubnetB
+  ECSPrivateSubnetA:
+    Value: !Ref ECSPrivateSubnetA
+    Export:
+      Name: ECSPrivateSubnetA
+  ECSPrivateSubnetB:
+    Value: !Ref ECSPrivateSubnetB
+    Export:
+      Name: ECSPrivateSubnetB
+  PublicSubnetA:
+    Value: !Ref PublicSubnetA
+    Export:
+      Name: PublicSubnetA
+  PublicSubnetB:
+    Value: !Ref PublicSubnetB
+    Export:
+      Name: PublicSubnetB
