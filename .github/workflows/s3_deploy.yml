@@ -18,4 +18,4 @@ jobs:
         run: aws s3 sync . s3://switch-plus-infra/resources/templates/ --delete --exclude main.yml
       - name: s3 sync pipelines
         working-directory: pipilines
-        run: aws s3 sync . s3://switch-plus-infra/pipelines/ --delete --exclude main.yml
+        run: aws s3 sync . s3://switch-plus-infra/pipelines/ --delete --exclude app/main.yml web/main.yml
