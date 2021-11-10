@@ -1,0 +1,21 @@
+name: s3-deploy
+on: [push, delete]
+jobs:
+  to_s3:
+    name: upload cloudformation template to s3
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: "Configure AWS credentials"
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+      - name: s3 sync resources
+        working-directory: resources/templates
+        run: aws s3 sync . s3://switch-plus-infra/resources/templates/ --delete --exclude main.yml
+      - name: s3 sync pipelines
+        working-directory: pipilines
+        run: aws s3 sync . s3://switch-plus-infra/pipelines/ --delete --exclude main.yml
