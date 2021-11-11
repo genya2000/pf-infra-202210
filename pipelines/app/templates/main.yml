@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: SwitchPlus Main Template in App
+
+Parameters:
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.small
+    AllowedValues:
+      - db.t3.small
+      - db.t3.medium
+
+Resources:
+  SSMParamServiceName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /SwitchPlus/Name
+      Value: !Ref ServiceName
+
+  MyPipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore: # Optional
+        EncryptionKey: # Optional
+          Id: CHANGEME
+          Type: CHANGEME
+        Location: CHANGEME
+        Type: CHANGEME
+      ArtifactStores:
+        - ArtifactStore:
+            EncryptionKey: # Optional
+              Id: CHANGEME
+              Type: CHANGEME
+            Location: CHANGEME
+            Type: CHANGEME
+          Region: CHANGEME
+      DisableInboundStageTransitions:
+        - Reason: CHANGEME
+          StageName: CHANGEME
+      Name: CHANGEME # Optional
+      RestartExecutionOnUpdate: false # Optional
+      RoleArn: CHANGEME
+      Stages:
+        - Actions:
+            - ActionTypeId:
+                Category: CHANGEME
+                Owner: CHANGEME
+                Provider: CHANGEME
+                Version: CHANGEME
+              Configuration: '{"JSON": "CHANGEME"}' # Optional
+              InputArtifacts: # Optional
+                - Name: CHANGEME
+              Name: CHANGEME
+              Namespace: CHANGEME # Optional
+              OutputArtifacts: # Optional
+                - Name: CHANGEME
+              Region: CHANGEME # Optional
+              RoleArn: CHANGEME # Optional
+              RunOrder: 0 # Optional
+          Blockers: # Optional
+            - Name: CHANGEME
+              Type: CHANGEME
+          Name: CHANGEME
+      Tags:
+        - Key: CHANGEME
+          Value: CHANGEME
+
+Outputs:
+  MyPipelineVersion:
+    Value: !GetAtt MyPipeline.Version
+
