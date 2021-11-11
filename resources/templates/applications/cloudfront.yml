@@ -16,10 +16,22 @@ Resources:
             DomainName: '{{resolve:ssm:/SwitchPlus/CloudFrontS3DomainName}}' 
             S3OriginConfig:
               OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}
+        DefaultRootObject: index.html
+        CustomErrorResponse:
+          - ErrorCachingMinTTl: 0
+            ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /
         DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - PATCH
+            - POST
+            - DELETE
           TargetOriginId: S3Origin
-          ForwardedValues:
-            QueryString: false
           ViewerProtocolPolicy: redirect-to-https
           FunctionAssociations:
             # CFへのリクエスト時にBasic認証をおこなう
