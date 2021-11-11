@@ -1,0 +1,4 @@
+FROM centos:centos7
+
+RUN curl -kL https://bootstrap.pypa.io/pip/3.5/get-pip.py| python
+RUN pip install cfn-lint
