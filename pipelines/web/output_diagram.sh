@@ -1,13 +1,14 @@
 #!/bin/bash
 
-workingdir=/var/www/cw-imedia-infra
-dockerimage=node:latest
+mountdir=/var/www/workdir
+workingdir=$mountdir/templates
+dockerimage=cfn-diagram:latest
 
 docker run \
     -it \
     --rm \
-    -v $PWD:$workingdir/ \
-    -w $workingdir/$1 \
-    node_test:latest cfn-dia html -t $2 -o $workingdir/diagrams/outputs
+    -v $PWD:$mountdir/ \
+    -w $workingdir \
+    $dockerimage cfn-dia html -t $workingdir/diagram.yml -o $mountdir/outputs
 
-open diagrams/outputs/index.html
+open $PWD/outputs/index.html
