@@ -20,7 +20,7 @@ Parameters:
   BasicPass:
     NoEcho: true
     Type: String
-    Default: switch-plus0401
+    Default: switch-plus0401 
 
   CloudFrontS3DomainName:
     Type: String
@@ -121,29 +121,29 @@ Resources:
   Network:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://imedia-cloudformation.s3.ap-northeast-1.amazonaws.com/cloudformation/templates/network.yml
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/network.yml
 
   Security:
     Type: AWS::CloudFormation::Stack
     DependsOn: Network
     Properties:
-      TemplateURL: https://imedia-cloudformation.s3.ap-northeast-1.amazonaws.com/cloudformation/templates/securities/security_group.yml
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/securities/security_group.yml
 
   Cloudfront:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://imedia-cloudformation.s3.ap-northeast-1.amazonaws.com/cloudformation/templates/applications/cloudfront.yml
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/applications/cloudfront.yml
 
   DB:
     Type: AWS::CloudFormation::Stack
     DependsOn: [Network, Security]
     Properties: 
-      TemplateURL: https://imedia-cloudformation.s3.ap-northeast-1.amazonaws.com/cloudformation/templates/applications/db.yml
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/applications/db.yml
 
-  ECS:
-    Type: AWS::CloudFormation::Stack
-    DependsOn: [Network, Security]
-    Properties: 
-      TemplateURL: https://imedia-cloudformation.s3.ap-northeast-1.amazonaws.com/cloudformation/templates/resources/ecs.yml
+        #  ECS:
+        #    Type: AWS::CloudFormation::Stack
+        #    DependsOn: [Network, Security]
+        #    Properties: 
+        #      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/applications/ecs.yml
 
 
