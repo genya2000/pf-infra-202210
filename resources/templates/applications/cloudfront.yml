@@ -13,7 +13,7 @@ Resources:
         IPV6Enabled: false
         Origins:
           - Id: S3Origin
-            DomainName: '{{resolve:ssm:/SwitchPlus/CloudFrontS3DomainName}}' 
+            DomainName: '{{resolve:ssm:/SwitchPlus/CloudFrontS3DomainName}}'
             S3OriginConfig:
               OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}
         DefaultRootObject: index.html

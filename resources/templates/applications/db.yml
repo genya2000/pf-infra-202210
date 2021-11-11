@@ -9,7 +9,7 @@ Resources:
       EngineVersion: 5.7.mysql_aurora.2.10.1
       EngineMode: provisioned
       DBClusterIdentifier: stg-imedia-cluster
-        # DBClusterParameterGroupName: aurora-mysql5.7 
+        # DBClusterParameterGroupName: aurora-mysql5.7
       DBSubnetGroupName: !Ref DBSubnetGroup
       DatabaseName: '{{resolve:ssm:/SwitchPlus/DatabaseName}}'
       DeletionProtection: false

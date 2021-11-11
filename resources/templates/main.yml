@@ -20,7 +20,7 @@ Parameters:
   BasicPass:
     NoEcho: true
     Type: String
-    Default: switch-plus0401 
+    Default: switch-plus0401
 
   CloudFrontS3DomainName:
     Type: String
@@ -48,7 +48,7 @@ Parameters:
   DBInstanceClass:
     Type: String
     Default: db.t3.small
-    AllowdValues:
+    AllowedValues:
       - db.t3.small
       - db.t3.medium
 
@@ -137,13 +137,13 @@ Resources:
   DB:
     Type: AWS::CloudFormation::Stack
     DependsOn: [Network, Security]
-    Properties: 
+    Properties:
       TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/applications/db.yml
 
         #  ECS:
         #    Type: AWS::CloudFormation::Stack
         #    DependsOn: [Network, Security]
-        #    Properties: 
+        #    Properties:
         #      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/applications/ecs.yml
 
 
