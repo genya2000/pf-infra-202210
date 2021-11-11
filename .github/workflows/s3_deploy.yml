@@ -15,7 +15,11 @@ jobs:
           aws-region: ap-northeast-1
       - name: s3 sync resources
         working-directory: resources/templates
-        run: aws s3 sync . s3://switch-plus-infra/resources/templates/ --delete --exclude main.yml
-      - name: s3 sync pipelines
+        run: aws s3 sync . s3://switch-plus-infra/resources/templates/ --delete --exclude main.yml --exclude diagram.yml
+      - name: s3 sync pipelines app
         working-directory: pipelines
-        run: aws s3 sync . s3://switch-plus-infra/pipelines/ --delete --exclude app/main.yml --exclude web/main.yml
+        run: aws s3 sync . s3://switch-plus-infra/pipelines/app/templates --delete --exclude main.yml --exclude diagram.yml
+      - name: s3 sync pipelines web
+        working-directory: pipelines
+        run: aws s3 sync . s3://switch-plus-infra/pipelines/web/templates --delete --exclude main.yml --exclude diagram.yml
+
