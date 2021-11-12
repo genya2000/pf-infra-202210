@@ -9,7 +9,13 @@ help:
 	@echo 'guard          -- 引数に渡したテンプレートファイルのセキュリティチェック・事前設定したルールに沿っているかチェックを行います 例) make guard TMPL=main.yml'
 	@echo 'rain           -- 引数に渡したテンプレートファイルを元にスタックをデプロイする 例) make rain TMPL=main.yml'
 	@echo 'rain-rm        -- 引数に渡したスタック名と一致するスタックを削除する 例) make rain-rm TMPL=main.yml '
+	@echo ''
+	@echo '---------- ECSに関するコマンド ----------'
+	@echo 'executable     -- 引数に渡した情報を元にFargateのサービス内のコンテナに exec(コマンド実行)を可能にする'
+	@echo 'exec           -- 引数に渡した情報を元にコンテナ内で /bin/sh を実行する'
+	@echo 'describe       -- 引数に渡した情報を元にFargateのサービスの情報をJSONで取得する'
 	@echo '---------- Gitに関するコマンド ----------'
+	@echo ''
 	@echo 'git-setup      -- Gitのローカル環境のuser.nameとuser.emailを設定します'
 	@echo 'docker-setup   -- 各種CLIコマンド実行用のDockerイメージをビルドします'
 
@@ -23,7 +29,13 @@ guard:
 rain:
 	docker run -it --rm -v ${HOME}/.aws:/root/.aws -v ${MAKEFILE_DIR}:/var/www/workdir -w /var/www/workdir rain:latest deploy ${TMPL}
 rain-rm:
-	docker run -it --rm -v ${HOME}/.aws:/root/.aws -v ${MAKEFILE_DIR}:/var/www/workdir -w /var/www/workdir rain:latest rm ${TMPL}
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws -v ${MAKEFILE_DIR}:/var/www/workdir -w /var/www/workdir rain:latest rm ${STACK}
+executable:
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs update-service --cluster ${CLUSTER} --service ${SERVICE} --enable-execute-command
+exec:
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs execute-command --interactive --cluster ${CLUSTER} --task ${TASK} --container ${CONTAINER}  --command /bin/sh
+describe:
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs describe-services --cluster ${CLUSTER} --services ${SERVICE} --query services\[0\].enableExecuteCommand
 git-setup:
 	$(shell ./.make/setup_git.sh)
 docker-setup:
