@@ -12,4 +12,4 @@ docker run \
     -w $workingdir \
     $dockerimage cfn-dia html -t $workingdir/$1 -o $mountdir/outputs/$dirname
 
-open $PWD/outputs/index.html
+open $PWD/outputs/$dirname/index.html
