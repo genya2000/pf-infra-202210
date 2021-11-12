@@ -1,0 +1,11 @@
+FROM amazon/aws-cli:latest
+
+ARG RAIN_VER=1.2.0
+ADD https://github.com/aws-cloudformation/rain/releases/download/v${RAIN_VER}/rain-v${RAIN_VER}_linux-amd64.zip /tmp/rain.zip
+
+RUN yum install unzip -y \
+ && unzip -j /tmp/rain.zip */rain -d /usr/local/bin/ \
+ && chmod 755 /usr/local/bin/rain \
+ && rm /tmp/rain.zip
+
+ENTRYPOINT ["/usr/local/bin/rain"]
