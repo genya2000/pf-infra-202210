@@ -1,22 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: SwitchPlus Main Template in App
 
-Parameters:
-  DBInstanceClass:
-    Type: String
-    Default: db.t3.small
-    AllowedValues:
-      - db.t3.small
-      - db.t3.medium
-
 Resources:
-  SSMParamServiceName:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Type: String
-      Name: /SwitchPlus/Name
-      Value: !Ref ServiceName
-
   AppPipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -25,14 +10,14 @@ Resources:
         Type: S3
         Location: switch-plus-infra
       RestartExecutionOnUpdate: false
-      RoleArn: # 必須
+      RoleArn: arn:aws:iam::176282227532:role/CodePipelineServiceRole
       Stages:
 
       ##### Sourceステージ #####
         - Name: ApiSource
           Actions:
-            - Name: source-api
-              Namespace: SwitchPlus # Optional
+            - Name: api-source
+              Region: ap-northeast-1
               ActionTypeId:
                 Category: Source
                 Owner: AWS
@@ -43,61 +28,68 @@ Resources:
                 BranchName: master
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
-              InputArtifacts:
-                - Name: appInput
               OutputArtifacts:
-                - Name: appOutput
-              Region: ap-northeast-1
+                - Name: apiBuildArtifact
               RunOrder: 1
 
       ##### Buildステージ #####
         - Name: ApiBuild
           Actions:
-            - Name: build-api
-              Namespace: SwitchPlus # Optional
+            - Name: api-build-image
+              Region: ap-northeast-1
               ActionTypeId:
-                Category: Source
+                Category: Build
                 Owner: AWS
-                Provider: CodeCommit
+                Provider: CodeBuild
                 Version: 1
               Configuration:
-                RepositoryName: cw-imedia-api
-                BranchName: master
-                PollForSourceChanges: true
-                OutputArtifactFormat: CODEBUILD_CLONE_REF
+                ProjectName: !Ref ApiImageBuildProject
               InputArtifacts:
-                - Name: appInput
+                - Name: apiBuildArtifact
               OutputArtifacts:
-                - Name: appOutput
-              Region: ap-northeast-1
-              RunOrder: 1
+                - Name: apiTestArtifact
+              RunOrder: 2
 
-      ##### Deployステージ #####
-        - Name: ApiDeploy
+        - Name: ApiTest
           Actions:
-            - Name: deploy-api
-              Namespace: SwitchPlus # Optional
+            - Name: api-test
+              Region: ap-northeast-1
               ActionTypeId:
-                Category: Source
+                Category: Test
                 Owner: AWS
-                Provider: CodeCommit
+                Provider: CodeBuild
                 Version: 1
               Configuration:
-                RepositoryName: cw-imedia-api
-                BranchName: master
-                PollForSourceChanges: true
-                OutputArtifactFormat: CODEBUILD_CLONE_REF
+                ProjectName: !Ref ApiTestProject
               InputArtifacts:
-                - Name: appInput
-              OutputArtifacts:
-                - Name: appOutput
-              Region: ap-northeast-1
-              RunOrder: 1
-      Tags:
-        - Key: Name
-          Value: stg-app-pipeline
+                - Name: apiTestArtifact
+              RunOrder: 3
 
-Outputs:
-  MyPipelineVersion:
-    Value: !GetAtt MyPipeline.Version
+  ApiTestProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:2.0
+        Type: LINUX_CONTAINER
+      ServiceRole: arn:aws:iam::176282227532:role/CodeBuildServiceRole
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: .buildspec.yml
+
+  ApiImageBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:2.0
+        Type: LINUX_CONTAINER
+      ServiceRole: arn:aws:iam::176282227532:role/CodeBuildServiceRole
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: .testspec.yml
 
