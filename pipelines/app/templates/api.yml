@@ -25,7 +25,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-api
-                BranchName: master
+                BranchName: feature/test_pipeline_app_repository
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
