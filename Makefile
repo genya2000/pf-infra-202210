@@ -1,9 +1,7 @@
 MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 help:
-	@echo '---------- 環境構築に関するコマンド -----------'
-	@echo 'init           -- プロジェクト初期のセットアップを行います ※基本的にクローンしてきて1回目のみ実行'
-	@echo ''
+	@echo '---------- 環境構築に関するコマンド -----------' @echo 'init           -- プロジェクト初期のセットアップを行います ※基本的にクローンしてきて1回目のみ実行' @echo ''
 	@echo '---------- CFnに関するコマンド ----------'
 	@echo 'lint           -- 引数に渡したテンプレートファイルの構文チェックを行います 例) make lint TMPL=main.yml'
 	@echo 'guard          -- 引数に渡したテンプレートファイルのセキュリティチェック・事前設定したルールに沿っているかチェックを行います 例) make guard TMPL=main.yml'
@@ -27,9 +25,11 @@ lint:
 guard:
 	docker run -it --rm -v ${MAKEFILE_DIR}:/var/www/workdir -w /var/www/workdir cfn-guard:latest cfn-guard ${TMPL}
 rain:
-	docker run -it --rm -v ${HOME}/.aws:/root/.aws -v ${MAKEFILE_DIR}:/var/www/workdir -w /var/www/workdir rain:latest deploy ${TMPL}
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws -v ${MAKEFILE_DIR}:/var/www/workdir -w /var/www/workdir rain:latest deploy ${TMPL} ${STACK}
 rain-rm:
 	docker run -it --rm -v ${HOME}/.aws:/root/.aws -v ${MAKEFILE_DIR}:/var/www/workdir -w /var/www/workdir rain:latest rm ${STACK}
+rain-ls:
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws -w /var/www/workdir rain:latest list
 executable:
 	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs update-service --cluster ${CLUSTER} --service ${SERVICE} --enable-execute-command
 exec:
