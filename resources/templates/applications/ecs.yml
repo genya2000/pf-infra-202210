@@ -27,10 +27,11 @@ Resources:
   ContentService:
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: !Sub '${Env}-content'
-      Cluster: !Ref ECSCluster
       LaunchType: FARGATE
+      TaskDefinition: !Ref ContentTaskDefinition
       PlatformVersion: 1.4.0
+      Cluster: !Ref ECSCluster
+      ServiceName: !Sub '${Env}-content'
       DesiredCount: 1
       LoadBalancers:
         - ContainerName: !Sub '${Env}-content'
@@ -40,14 +41,14 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - !ImportValue SecGroupECS
+            - !ImportValue SecGroupECSBefore
+            - !ImportValue secGroupECSAfter
           Subnets:
             - !ImportValue ECSPrivateSubnetA
             - !ImportValue ECSPrivateSubnetB
       EnableECSManagedTags: true
       EnableExecuteCommand: true
       HealthCheckGracePeriodSeconds: 60
-      TaskDefinition: !Ref ContentTaskDefinition
         # Role: arn:aws:iam::176282227532:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS # 埋め込みたい
 
   ContentTaskDefinition:
@@ -55,7 +56,7 @@ Resources:
     Properties:
       Cpu: 256
       Memory: 512
-      ExecutionRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS # TODO 埋め込みたい
+      ExecutionRoleArn: arn:aws:iam::176282227532:role/ECSTaskExecutionRole # TODO 埋め込みたい
       RequiresCompatibilities:
         - FARGATE
       NetworkMode: awsvpc
@@ -91,7 +92,7 @@ Resources:
           #     - Name: MACKEREL_APIKEY
           #       Value: # TODO API_KEY
           #   Essential: false
-      TaskRoleArn: arn:aws:iam::176282227532:role/ECSTaskExecutionRole
+      TaskRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-taskdefinition'
@@ -100,14 +101,14 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Type: application
-      IpAddressType: ipv4
       Name: !Sub '${Env}-content'
       Scheme: internet-facing
-      SecurityGroups:
-        - !ImportValue SecGroupAlb
+      IpAddressType: ipv4
       Subnets:
         - !ImportValue PublicSubnetA
         - !ImportValue PublicSubnetB
+      SecurityGroups:
+        - !ImportValue SecGroupAlb
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-content'
@@ -116,27 +117,27 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     DependsOn: LoadBalancer
     Properties:
-      IpAddressType: ipv4
-      VpcId: !ImportValue VpcId
+      TargetType: ip
       Name: !Sub '${Env}-content'
       Protocol: HTTP
       Port: 80
-      TargetType: ip
+      IpAddressType: ipv4
+      VpcId: !ImportValue VpcId
       HealthCheckEnabled: true
-      HealthCheckIntervalSeconds: 60
-      HealthCheckPath: /favicon.ico
-      HealthCheckPort: 80
       HealthCheckProtocol: HTTP
+      HealthCheckPort: 80
+      HealthCheckPath: /favicon.ico
+      HealthCheckIntervalSeconds: 60
       HealthCheckTimeoutSeconds: 6
       HealthyThresholdCount: 5
 
   ALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Protocol: HTTP
+      Port: 80
       DefaultActions:
         - TargetGroupArn: !Ref ALBTargetGroup
           Type: forward
-      LoadBalancerArn: !Ref LoadBalancer
-      Port: 80
-      Protocol: HTTP
 

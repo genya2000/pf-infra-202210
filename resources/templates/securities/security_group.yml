@@ -88,10 +88,14 @@ Resources:
           Value: !Sub '${Env}-${ServiceName}-alb-secgroup'
 
 Outputs:
-  SecGroupECS:
+  secGroupECSBefore:
+    Value: !Ref ECSSecurityGroupBefore
+    Export:
+      Name: secGroupECSBefore
+  SecGroupECSAfter:
     Value: !Ref EcsSecurityGroupAfter
     Export:
-      Name: SecGroupECS
+      Name: SecGroupECSAfter
   SecGroupDb:
     Value: !Ref DBSecurityGroup
     Export:
