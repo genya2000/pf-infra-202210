@@ -107,6 +107,18 @@ Resources:
         Runtime: cloudfront-js-1.0
       Name: basic-authentication
 
+  AssetsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: stg-imedia-cms
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: !Sub arn:aws:s3:::stg-imedia-cms/*
+            Principal:
+              AWS: !Sub arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}
+
         #   CachePolicy:
         #     Type: AWS::CloudFront::CachePolicy
         #     Properties:
