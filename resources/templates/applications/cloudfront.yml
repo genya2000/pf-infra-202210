@@ -28,7 +28,7 @@ Resources:
         IPV6Enabled: false
         Origins:
           - Id: S3Origin
-            DomainName: stg-imedia-cms
+            DomainName: stg-imedia-cms.s3.ap-northeast-1.amazonaws.com
             S3OriginConfig:
               OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}
         DefaultRootObject: index.html
