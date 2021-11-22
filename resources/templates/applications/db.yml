@@ -59,7 +59,7 @@ Resources:
         max_allowed_packet: 1024
       Tags:
         - Key: Name
-          Value: '${Env}-${ServiceName}-db-parameter-group'
+          Value: !Sub '${Env}-${ServiceName}-db-parameter-group'
 
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
@@ -70,5 +70,5 @@ Resources:
         - !ImportValue DBPrivateSubnetB
       Tags:
         - Key: Name
-          Value: '${Env}-${ServiceName}-db-subnet-group'
+          Value: !Sub '${Env}-${ServiceName}-db-subnet-group'
 
