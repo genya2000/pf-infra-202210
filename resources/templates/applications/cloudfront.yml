@@ -38,6 +38,7 @@ Resources:
             ResponseCode: 200
             ResponsePagePath: /
         DefaultCacheBehavior:
+          CachePolicyId: !Ref CachePolicy
           AllowedMethods:
             - GET
             - HEAD
@@ -105,3 +106,22 @@ Resources:
         Comment: basic authentication to stg-s3
         Runtime: cloudfront-js-1.0
       Name: basic-authentication
+
+  CachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        DefaultTTL: 86400
+        MaxTTL: 31536000
+        MinTTL: 86400
+        Name: !Sub '${Env}-${ServiceName}-cachepolicy'
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: all
+          EnableAcceptEncodingBrotli: false # Optional
+          EnableAcceptEncodingGzip: false
+          HeadersConfig:
+            HeaderBehavior: whitelist
+          QueryStringsConfig:
+            QueryStringBehavior: all
+
