@@ -27,8 +27,8 @@ Resources:
       DBSubnetGroupName: !Ref DBSubnetGroup
       DatabaseName: switch_plus
       DeletionProtection: false
-      MasterUsername: '{{resolve:ssm:/switch-plus/master_username}}'
-      MasterUserPassword: '{{resolve:ssm:/switch-plus/master_userpass}}'
+      MasterUsername: switchplus #'{{resolve:ssm:/switch-plus/master_username}}'
+      MasterUserPassword: SwitchStg1122 # '{{resolve:ssm:/switch-plus/master_userpass}}'
       Port: 3306
       VpcSecurityGroupIds:
         - !ImportValue SecGroupDb
