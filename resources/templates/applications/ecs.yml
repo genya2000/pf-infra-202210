@@ -105,8 +105,8 @@ Resources:
       SecurityGroups:
         - !ImportValue SecGroupAlb
       Subnets:
-        - !ImportValue PublicSubnet1
-        - !ImportValue PublicSubnet2
+        - !ImportValue PublicSubnetA
+        - !ImportValue PublicSubnetB
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-content'
