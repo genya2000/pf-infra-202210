@@ -11,7 +11,8 @@ Parameters:
     Type: String
     Default: stg
     AllowedValues:
-      - stg - prod
+      - stg
+      - prod
     Description: Enter stg or prod
 
 Resources:
