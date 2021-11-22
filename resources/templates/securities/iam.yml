@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: IAM User and Role, Policy in resources
+
+Resources:
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ECSTaskExecutionRole
+      AssumeRolePolicyDocument: {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Principal": {
+              "Service": "ecs-tasks.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow" 
+          }
+        ]
+      }
+      Description: ECS ServiceRole
+
+  ECSServicePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: ECSServicePolicy
+      PolicyDocument: {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "ecr:GetAuthorizationToken",
+                      "ecr:BatchCheckLayerAvailability",
+                      "ecr:GetDownloadUrlForLayer",
+                      "ecr:BatchGetImage",
+                      "logs:CreateLogStream",
+                      "logs:PutLogEvents"
+                  ],
+                  "Resource": "*"
+              }
+          ]
+      }
+      Roles:
+        - !Ref ECSServiceRole
+
+
+    ECSServiceTaskRoleForExecAccessToECS:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ECSServiceTaskRoleForExecAccessToECS
+      AssumeRolePolicyDocument: {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Principal": {
+                      "Service": "ecs-tasks.amazonaws.com"
+                  },
+                  "Action": "sts:AssumeRole",
+                  "Effect": "Allow"
+              }
+          ]
+      }
+      Description: ECS ServiceRole
+
+
+    ECSServicePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: ECSServicePolicy
+      PolicyDocument: {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "ecr:GetAuthorizationToken",
+                      "ecr:BatchCheckLayerAvailability",
+                      "ecr:GetDownloadUrlForLayer",
+                      "ecr:BatchGetImage",
+                      "logs:CreateLogStream",
+                      "logs:PutLogEvents"
+                  ],
+                  "Resource": "*"
+              },
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "ssmmessages:CreateControlChannel",
+                      "ssmmessages:CreateDataChannel",
+                      "ssmmessages:OpenControlChannel",
+                      "ssmmessages:OpenDataChannel"
+                  ],
+                  "Resource": "*"
+              }
+          ]
+      }
+      Roles:
+        - !Ref ECSServiceRole
+

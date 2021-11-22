@@ -5,10 +5,10 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: stg-imedia-content-cluster
+      ClusterName: stg-imedia-content
       Tags:
         - Key: name
-          Value: stg-imedia-content-cluster
+          Value: stg-imedia-content
 
   ContentService:
     Type: AWS::ECS::Service
@@ -17,7 +17,8 @@ Resources:
       Cluster: !Ref ECSCluster
       LaunchType: FARGATE
       PlatformVersion: 1.4.0
-      LoadBalancers:
+      DesiredCount: 1
+      LoadBalancers: 
         - ContainerName: stg-imedia-content
           ContainerPort: 443
           TargetGroupArn: !Ref ALBTargetGroup
@@ -29,14 +30,17 @@ Resources:
           Subnets:
             - !ImportValue PrivateSubnetECS
       EnableECSManagedTags: true
+      EnableExecuteCommand: true
+      HealthCheckGracePeriodSeconds: 60
       TaskDefinition: !Ref ContentTaskDefinition
+      Role: arn:aws:iam::176282227532:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS
 
   ContentTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Cpu: 256
       Memory: 512
-      ExecutionRoleArn: arn:aws:iam::176282227532:role/ecsTaskExecutionRole
+      ExecutionRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS
       RequiresCompatibilities:
         - FARGATE
       NetworkMode: awsvpc
@@ -72,6 +76,7 @@ Resources:
           #     - Name: MACKEREL_APIKEY
           #       Value: # TODO API_KEY
           #   Essential: false
+      TaskRoleArn: arn:aws:iam::176282227532:role/ECSTaskExecutionRole
       Tags:
         - Key: name
           Value: stg-imedia-taskdefinition
@@ -96,11 +101,20 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     DependsOn: LoadBalancer
     Properties:
+      IpAddressType: ipv4
       VpcId: !ImportValue VpcId
       Name: stg-imedia-content
       Protocol: HTTP
       Port: 80
       TargetType: ip
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 60
+      HealthCheckPath: favicon.ico
+      HealthCheckPort: 80
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 6
+      HealthyThresholdCount: 5
+
 
   ALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
