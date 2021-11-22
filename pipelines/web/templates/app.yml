@@ -1,6 +1,20 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: SwitchPlus Main Template in App
 
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switch-plus
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValue:
+      - stg
+      - prod
+
+
+
 Resources:
   AppPipeline:
     Type: AWS::CodePipeline::Pipeline
@@ -78,7 +92,7 @@ Resources:
             Value: stg-imedia-web
           - Type: PLAINTEXT
             Name: DISTRIBUTION_ID
-            Value: E324HP9OKRZ9JK
+            Value: E24AL2VU6Y9Z97
       ServiceRole: arn:aws:iam::176282227532:role/CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE
