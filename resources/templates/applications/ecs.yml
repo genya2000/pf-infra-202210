@@ -42,7 +42,7 @@ Resources:
           AssignPublicIp: ENABLED
           SecurityGroups:
             - !ImportValue SecGroupECSBefore
-            - !ImportValue secGroupECSAfter
+            - !ImportValue SecGroupECSAfter
           Subnets:
             - !ImportValue ECSPrivateSubnetA
             - !ImportValue ECSPrivateSubnetB
