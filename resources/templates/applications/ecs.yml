@@ -42,7 +42,8 @@ Resources:
           SecurityGroups:
             - !ImportValue SecGroupECS
           Subnets:
-            - !ImportValue PrivateSubnetECS
+            - !ImportValue ECSPrivateSubnetA
+            - !ImportValue ECSPrivateSubnetB
       EnableECSManagedTags: true
       EnableExecuteCommand: true
       HealthCheckGracePeriodSeconds: 60
