@@ -28,7 +28,7 @@ Resources:
         IPV6Enabled: false
         Origins:
           - Id: S3Origin
-            DomainName: 'stg-imedia-cms' # TODO ベタ書き要改修
+            DomainName: stg-imedia-cms
             S3OriginConfig:
               OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}
         DefaultRootObject: index.html
