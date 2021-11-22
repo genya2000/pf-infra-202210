@@ -1,11 +1,10 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: SwitchPlus Main Template in App
-
+Description: SwitchPlus Api Pipeline Template
 Resources:
-  AppPipeline:
+  ApiPipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: stg-app-pipeline
+      Name: stg-api-pipeline
       ArtifactStore:
         Type: S3
         Location: switch-plus-infra
@@ -25,7 +24,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-api
-                BranchName: develop
+                BranchName: feature/IM-add_pipeline
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
@@ -60,6 +59,28 @@ Resources:
         Image: aws/codebuild/standard:5.0
         Type: LINUX_CONTAINER
         PrivilegedMode: true
+        EnvironmentVariables:
+          - Type: PARAMETER_STORE
+            Name: AWS_ACCESS_KEY
+            Value: /switch-plus/aws_access_key
+          - Type: PARAMETER_STORE
+            Name: AWS_SECRET_ACCESS_KEY
+            Value: /switch-plus/aws_secret_access_key
+          - Type: PARAMETER_STORE
+            Name: AWS_ACCOUNT_ID
+            Value: /switch-plus/aws_account_id
+          - Type: PLAINTEXT
+            Name: AWS_REGION
+            Value: ap-northeast-1
+          - Type: PLAINTEXT
+            Name: BUCKET
+            Value: switch-plus
+          - Type: PLAINTEXT
+            Name: ENV
+            Value: stg
+          - Type: PLAINTEXT
+            Name: IMAGE_NAME
+            Value: cw-imedia-api
       ServiceRole: arn:aws:iam::176282227532:role/CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE

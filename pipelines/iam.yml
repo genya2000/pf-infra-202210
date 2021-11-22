@@ -6,15 +6,17 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: CodeBuildServiceRole
-      AssumeRolePolicyDocument: { "Version": "2012-10-17",
-        "Statement": [
-          {
-            "Principal": {
-              "Service": "codebuild.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole",
-            "Effect": "Allow" }
-        ]
+      AssumeRolePolicyDocument: {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Principal": {
+                      "Service": "codebuild.amazonaws.com"
+                  },
+                  "Action": "sts:AssumeRole",
+                  "Effect": "Allow" 
+              }
+          ]
       }
       Description: CodeBuild ServiceRole
 
@@ -24,87 +26,87 @@ Resources:
     Properties:
       PolicyName: CodeBuildExecuteGitPullPolicy
       PolicyDocument: {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Resource": [
-                  "arn:aws:ssm:ap-northeast-1:176282227532:parameter/switch-plus/*"
-                ],
-                "Action": [
-                  "ssm:GetParameters"
-                ]
-            },
-            {
-                "Effect": "Allow",
-                "Resource": [
-                    "arn:aws:logs:ap-northeast-1:176282227532:log-group:/aws/codebuild/*",
-                    "arn:aws:logs:ap-northeast-1:176282227532:log-group:/aws/codebuild/*:*"
-                ],
-                "Action": [
-                    "logs:CreateLogGroup",
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents"
-                ]
-            },
-            {
-                "Effect": "Allow",
-                "Resource": [
-                    "arn:aws:s3:::switch-plus-infra*"
-                ],
-                "Action": [
-                    "s3:PutObject",
-                    "s3:GetObject",
-                    "s3:GetObjectVersion",
-                    "s3:GetBucketAcl",
-                    "s3:GetBucketLocation"
-                ]
-            },
-            {
-                "Effect": "Allow",
-                "Resource": [
-                    "arn:aws:codecommit:ap-northeast-1:176282227532:*"
-                ],
-                "Action": [
-                    "codecommit:GitPull"
-                ]
-            },
-            {
-                "Effect": "Allow",
-                "Action": [
-                    "codebuild:CreateReportGroup",
-                    "codebuild:CreateReport",
-                    "codebuild:UpdateReport",
-                    "codebuild:BatchPutTestCases",
-                    "codebuild:BatchPutCodeCoverages"
-                ],
-                "Resource": [
-                    "arn:aws:codebuild:ap-northeast-1:176282227532:report-group/*"
-                ]
-            },
-            {
-                "Effect": "Allow",
-                "Action": [
-                    "ecr:GetAuthorizationToken",
-                    "ecr:BatchCheckLayerAvailability",
-                    "ecr:GetDownloadUrlForLayer",
-                    "ecr:GetRepositoryPolicy",
-                    "ecr:DescribeRepositories",
-                    "ecr:ListImages",
-                    "ecr:DescribeImages",
-                    "ecr:BatchGetImage",
-                    "ecr:GetLifecyclePolicy",
-                    "ecr:GetLifecyclePolicyPreview",
-                    "ecr:ListTagsForResource",
-                    "ecr:DescribeImageScanFindings",
-                    "ecr:InitiateLayerUpload",
-                    "ecr:UploadLayerPart",
-                    "ecr:CompleteLayerUpload",
-                    "ecr:PutImage"
-                ],
-                "Resource": "*"
-            }
-        ]
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Effect": "Allow",
+                  "Resource": [
+                      "arn:aws:ssm:ap-northeast-1:176282227532:parameter/switch-plus/*"
+                  ],
+                  "Action": [
+                      "ssm:GetParameters"
+                  ]
+              },
+              {
+                  "Effect": "Allow",
+                  "Resource": [
+                      "arn:aws:logs:ap-northeast-1:176282227532:log-group:/aws/codebuild/*",
+                      "arn:aws:logs:ap-northeast-1:176282227532:log-group:/aws/codebuild/*:*"
+                  ],
+                  "Action": [
+                      "logs:CreateLogGroup",
+                      "logs:CreateLogStream",
+                      "logs:PutLogEvents"
+                  ]
+              },
+              {
+                  "Effect": "Allow",
+                  "Resource": [
+                      "arn:aws:s3:::switch-plus-infra*"
+                  ],
+                  "Action": [
+                      "s3:PutObject",
+                      "s3:GetObject",
+                      "s3:GetObjectVersion",
+                      "s3:GetBucketAcl",
+                      "s3:GetBucketLocation"
+                  ]
+              },
+              {
+                  "Effect": "Allow",
+                  "Resource": [
+                      "arn:aws:codecommit:ap-northeast-1:176282227532:*"
+                  ],
+                  "Action": [
+                      "codecommit:GitPull"
+                  ]
+              },
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "codebuild:CreateReportGroup",
+                      "codebuild:CreateReport",
+                      "codebuild:UpdateReport",
+                      "codebuild:BatchPutTestCases",
+                      "codebuild:BatchPutCodeCoverages"
+                  ],
+                  "Resource": [
+                      "arn:aws:codebuild:ap-northeast-1:176282227532:report-group/*"
+                  ]
+              },
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "ecr:GetAuthorizationToken",
+                      "ecr:BatchCheckLayerAvailability",
+                      "ecr:GetDownloadUrlForLayer",
+                      "ecr:GetRepositoryPolicy",
+                      "ecr:DescribeRepositories",
+                      "ecr:ListImages",
+                      "ecr:DescribeImages",
+                      "ecr:BatchGetImage",
+                      "ecr:GetLifecyclePolicy",
+                      "ecr:GetLifecyclePolicyPreview",
+                      "ecr:ListTagsForResource",
+                      "ecr:DescribeImageScanFindings",
+                      "ecr:InitiateLayerUpload",
+                      "ecr:UploadLayerPart",
+                      "ecr:CompleteLayerUpload",
+                      "ecr:PutImage"
+                  ],
+                  "Resource": "*"
+              }
+          ]
       }
       Roles:
         - !Ref CodeBuildServiceRole
@@ -114,16 +116,16 @@ Resources:
     Properties:
       RoleName: CodePipelineServiceRole
       AssumeRolePolicyDocument: {
-        "Version": "2012-10-17",
-        "Statement": [
-          {
-            "Principal": {
-              "Service": "codepipeline.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole",
-            "Effect": "Allow"
-          }
-        ]
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Principal": {
+                      "Service": "codepipeline.amazonaws.com"
+                  },
+                  "Action": "sts:AssumeRole",
+                  "Effect": "Allow"
+              }
+          ]
       }
       Description: CodePipeline ServiceRole
 
@@ -132,46 +134,46 @@ Resources:
     Properties:
       PolicyName: CodePipelinePolicy
       PolicyDocument: {
-        "Statement": [
-            {
-                "Action": [
-                    "codecommit:CancelUploadArchive",
-                    "codecommit:GetBranch",
-                    "codecommit:GetCommit",
-                    "codecommit:GetRepository",
-                    "codecommit:GetUploadArchiveStatus",
-                    "codecommit:UploadArchive"
-                ],
-                "Resource": "*",
-                "Effect": "Allow"
-            },
-            {
-                "Action": [
-                    "cloudwatch:*",
-                    "s3:*",
-                ],
-                "Resource": "*",
-                "Effect": "Allow"
-            },
-            {
-                "Action": [
-                    "codebuild:BatchGetBuilds",
-                    "codebuild:StartBuild",
-                    "codebuild:BatchGetBuildBatches",
-                    "codebuild:StartBuildBatch"
-                ],
-                "Resource": "*",
-                "Effect": "Allow"
-            },
-            {
-                "Effect": "Allow",
-                "Action": [
-                    "ecr:DescribeImages"
-                ],
-                "Resource": "*"
-            }
-        ],
-        "Version": "2012-10-17"
-    }
+          "Version": "2012-10-17"
+          "Statement": [
+              {
+                  "Action": [
+                      "codecommit:CancelUploadArchive",
+                      "codecommit:GetBranch",
+                      "codecommit:GetCommit",
+                      "codecommit:GetRepository",
+                      "codecommit:GetUploadArchiveStatus",
+                      "codecommit:UploadArchive"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+              },
+              {
+                  "Action": [
+                      "cloudwatch:*",
+                      "s3:*",
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+              },
+              {
+                  "Action": [
+                      "codebuild:BatchGetBuilds",
+                      "codebuild:StartBuild",
+                      "codebuild:BatchGetBuildBatches",
+                      "codebuild:StartBuildBatch"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+              },
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "ecr:DescribeImages"
+                  ],
+                  "Resource": "*"
+              }
+          ]
+      }
       Roles:
         - !Ref CodePipelineServiceRole
