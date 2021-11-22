@@ -11,8 +11,7 @@ Parameters:
     Type: String
     Default: stg
     AllowedValues:
-      - stg
-      - prod
+      - stg - prod
     Description: Enter stg or prod
 
 Resources:
@@ -37,7 +36,8 @@ Resources:
             ResponseCode: 200
             ResponsePagePath: /
         DefaultCacheBehavior:
-          CachePolicyId: !Ref CachePolicy
+          ForwardedValues:
+            QueryString: true
           AllowedMethods:
             - GET
             - HEAD
@@ -106,21 +106,21 @@ Resources:
         Runtime: cloudfront-js-1.0
       Name: basic-authentication
 
-  CachePolicy:
-    Type: AWS::CloudFront::CachePolicy
-    Properties:
-      CachePolicyConfig:
-        DefaultTTL: 100
-        MaxTTL: 31536000
-        MinTTL: 86400
-        Name: !Sub '${Env}-${ServiceName}-cachepolicy'
-        ParametersInCacheKeyAndForwardedToOrigin:
-          CookiesConfig:
-            CookieBehavior: all
-          EnableAcceptEncodingBrotli: false
-          EnableAcceptEncodingGzip: false
-          HeadersConfig:
-            HeaderBehavior: whitelist
-          QueryStringsConfig:
-            QueryStringBehavior: all
+        #   CachePolicy:
+        #     Type: AWS::CloudFront::CachePolicy
+        #     Properties:
+        #       CachePolicyConfig:
+        #         DefaultTTL: 100
+        #         MaxTTL: 31536000
+        #         MinTTL: 86400
+        #         Name: !Sub '${Env}-${ServiceName}-cachepolicy'
+        #         ParametersInCacheKeyAndForwardedToOrigin:
+        #           CookiesConfig:
+        #             CookieBehavior: all
+        #           EnableAcceptEncodingBrotli: false
+        #           EnableAcceptEncodingGzip: false
+        #           HeadersConfig:
+        #             HeaderBehavior: whitelist
+        #           QueryStringsConfig:
+        #             QueryStringBehavior: all
 
