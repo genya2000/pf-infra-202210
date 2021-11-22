@@ -68,10 +68,10 @@ Resources:
             Value: /switch-plus/aws_secret_access_key
           - Type: PARAMETER_STORE
             Name: AWS_ACCOUNT_ID
-            Value: /switch-plus/aws_account_id
+            Value: !Ref AWS::AccountId
           - Type: PLAINTEXT
             Name: AWS_REGION
-            Value: ap-northeast-1
+            Value: !Ref AWS::Region
           - Type: PLAINTEXT
             Name: BUCKET
             Value: switch-plus
