@@ -19,7 +19,7 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Sub '${Env}-${ServiceName}-content'
+      ClusterName: !Sub '${Env}-content'
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-content'
@@ -27,14 +27,14 @@ Resources:
   ContentService:
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: !Sub '${Env}-${ServiceName}-content'
+      ServiceName: !Sub '${Env}-content'
       Cluster: !Ref ECSCluster
       LaunchType: FARGATE
       PlatformVersion: 1.4.0
       DesiredCount: 1
       LoadBalancers:
-        - ContainerName: !Sub '${Env}-${ServiceName}-content'
-          ContainerPort: 443
+        - ContainerName: !Sub '${Env}-content'
+          ContainerPort: 80
           TargetGroupArn: !Ref ALBTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -59,7 +59,7 @@ Resources:
         - FARGATE
       NetworkMode: awsvpc
       ContainerDefinitions:
-        - Name: !Sub '${Env}-${ServieName}-content'
+        - Name: !Sub '${Env}-content'
           Image: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/cw-imedia-api' # TODO ECRのイメージ名も埋め込みたい
           Memory: 256
           PortMappings:
@@ -100,7 +100,7 @@ Resources:
     Properties:
       Type: application
       IpAddressType: ipv4
-      Name: !Sub '${Env}-${ServiceName}-content'
+      Name: !Sub '${Env}-content'
       Scheme: internet-facing
       SecurityGroups:
         - !ImportValue SecGroupAlb
@@ -117,7 +117,7 @@ Resources:
     Properties:
       IpAddressType: ipv4
       VpcId: !ImportValue VpcId
-      Name: !Sub '${Env}-${ServiceName}-content'
+      Name: !Sub '${Env}-content'
       Protocol: HTTP
       Port: 80
       TargetType: ip
