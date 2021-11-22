@@ -25,7 +25,7 @@ Resources:
       DBClusterIdentifier: !Sub '${Env}-cluster'
         # DBClusterParameterGroupName: aurora-mysql5.7
       DBSubnetGroupName: !Ref DBSubnetGroup
-      DatabaseName: 'switch_plus'
+      DatabaseName: switch_plus
       DeletionProtection: false
       MasterUsername: '{{resolve:ssm:/switch-plus/master_username}}'
       MasterUserPassword: '{{resolve:ssm:/switch-plus/master_userpass}}'
@@ -43,7 +43,7 @@ Resources:
       DBClusterIdentifier: !Ref DBCluster
       Engine: aurora-mysql
       DBInstanceClass: db.t2.small
-      DBInstanceIdentifier: !Sub '${Env}-${ServiceName}-db'
+      DBInstanceIdentifier: !Sub '${Env}-db'
       DBParameterGroupName: !Ref DBParameterGroup
       DBSubnetGroupName: !Ref DBSubnetGroup
       Tags:
