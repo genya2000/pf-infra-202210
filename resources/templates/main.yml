@@ -123,6 +123,11 @@ Resources:
     Properties:
       TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/network.yml
 
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/iam.yml
+
   Security:
     Type: AWS::CloudFormation::Stack
     DependsOn: Network
