@@ -15,7 +15,6 @@ Parameters:
       - prod
     Description: Enter stg or prod
 
-
 Resources:
 
   ##### CloudFront Distribution の作成 #####
@@ -111,14 +110,14 @@ Resources:
     Type: AWS::CloudFront::CachePolicy
     Properties:
       CachePolicyConfig:
-        DefaultTTL: 86400
+        DefaultTTL: 100
         MaxTTL: 31536000
         MinTTL: 86400
         Name: !Sub '${Env}-${ServiceName}-cachepolicy'
         ParametersInCacheKeyAndForwardedToOrigin:
           CookiesConfig:
             CookieBehavior: all
-          EnableAcceptEncodingBrotli: false # Optional
+          EnableAcceptEncodingBrotli: false
           EnableAcceptEncodingGzip: false
           HeadersConfig:
             HeaderBehavior: whitelist
