@@ -235,7 +235,7 @@ Outputs:
   DBPrivateSubnetA:
     Value: !Ref DBPrivateSubnetA
     Export:
-      Name: PrivateSubnetDB1
+      Name: DBPrivateSubnetA
   DBPrivateSubnetB:
     Value: !Ref DBPrivateSubnetB
     Export:
