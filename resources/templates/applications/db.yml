@@ -22,7 +22,7 @@ Resources:
       Engine: aurora-mysql
       EngineVersion: 5.7.mysql_aurora.2.10.1
       EngineMode: provisioned
-      DBClusterIdentifier: !Sub '${Env}-${ServiceName}-cluster'
+      DBClusterIdentifier: !Sub '${Env}-cluster'
         # DBClusterParameterGroupName: aurora-mysql5.7
       DBSubnetGroupName: !Ref DBSubnetGroup
       DatabaseName: 'switch_plus'
