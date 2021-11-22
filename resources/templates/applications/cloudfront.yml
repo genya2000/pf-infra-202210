@@ -1,6 +1,21 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: CloudFront Template in Application Layer
 
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switch_plus
+    Description: Enter service name
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+
 Resources:
 
   ##### CloudFront Distribution の作成 #####

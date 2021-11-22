@@ -1,6 +1,21 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Network Layer Template
 
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switch_plus
+    Description: Enter service name
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+
 Resources:
   #####  VPCの作成 #####
   Vpc:
