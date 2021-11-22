@@ -7,7 +7,7 @@ Resources:
     Properties:
       ClusterName: stg-imedia-content
       Tags:
-        - Key: name
+        - Key: Name
           Value: stg-imedia-content
 
   ContentService:
@@ -78,7 +78,7 @@ Resources:
           #   Essential: false
       TaskRoleArn: arn:aws:iam::176282227532:role/ECSTaskExecutionRole
       Tags:
-        - Key: name
+        - Key: Name
           Value: stg-imedia-taskdefinition
 
   LoadBalancer:
