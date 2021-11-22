@@ -13,12 +13,12 @@ Resources:
         IPV6Enabled: false
         Origins:
           - Id: S3Origin
-            DomainName: '{{resolve:ssm:/SwitchPlus/CloudFrontS3DomainName}}'
+            DomainName: 'stg-imedia-cms' # TODO ベタ書き要改修
             S3OriginConfig:
               OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}
         DefaultRootObject: index.html
-        CustomErrorResponse:
-          - ErrorCachingMinTTl: 0
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 0
             ErrorCode: 403
             ResponseCode: 200
             ResponsePagePath: /
@@ -47,7 +47,7 @@ Resources:
             # AcmCertificateArn: !If [IsProd, !Sub 'arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/${SSLCertificateId}', '']
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-distribution'
+          Value: !Sub '${Env}-${ServiceName}-distribution'
 
 
   ##### CloudFrontからS3への OriginAccessIdentity の作成 #####
@@ -63,30 +63,29 @@ Resources:
     Type: AWS::CloudFront::Function
     Properties:
       AutoPublish: true
-      FunctionCode:
-        Fn::Sub: |
-          function handler(event) {
-            var request = event.request;
-            var headers = request.headers;
+      FunctionCode: |
+        function handler(event) {
+          var request = event.request;
+          var headers = request.headers;
 
-            var authUser = '{{resolve:ssm:/SwitchPlus/BasicUser}}';
-            var authPass = '{{resolve:ssm:/SwitchPlus/BasicPass}}';
-            var tmp = authUser + ':' + authPass;
-            var authString = 'Basic ' + tmp.toString('base64');
+          var authUser = '{{resolve:ssm:/switch-plus/basic_user}}';
+          var authPass = '{{resolve:ssm:/switch-plus/basic_pass}}';
+          var tmp = authUser + ':' + authPass;
+          var authString = 'Basic ' + tmp.toString('base64');
 
-            if (
-              typeof headers.authorization === "undefined" ||
-              headers.authorization.value !== authString
-            ) {
-              return {
-                statusCode: 401,
-                statusDescription: "Unauthorized",
-                headers: { "www-authenticate": { value: "Basic" } }
-              };
-            }
-
-            return request;
+          if (
+            typeof headers.authorization === "undefined" ||
+            headers.authorization.value !== authString
+          ) {
+            return {
+              statusCode: 401,
+              statusDescription: "Unauthorized",
+              headers: { "www-authenticate": { value: "Basic" } }
+            };
           }
+
+          return request;
+        }
       FunctionConfig:
         Comment: basic authentication to stg-s3
         Runtime: cloudfront-js-1.0

@@ -5,21 +5,21 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: stg-imedia-content
+      ClusterName: !Sub '${Env}-${ServiceName}-content'
       Tags:
         - Key: Name
-          Value: stg-imedia-content
+          Value: !Sub '${Env}-${ServiceName}-content'
 
   ContentService:
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: stg-imedia-content
+      ServiceName: !Sub '${Env}-${ServiceName}-content'
       Cluster: !Ref ECSCluster
       LaunchType: FARGATE
       PlatformVersion: 1.4.0
       DesiredCount: 1
-      LoadBalancers: 
-        - ContainerName: stg-imedia-content
+      LoadBalancers:
+        - ContainerName: !Sub '${Env}-${ServiceName}-content'
           ContainerPort: 443
           TargetGroupArn: !Ref ALBTargetGroup
       NetworkConfiguration:
@@ -33,20 +33,20 @@ Resources:
       EnableExecuteCommand: true
       HealthCheckGracePeriodSeconds: 60
       TaskDefinition: !Ref ContentTaskDefinition
-      Role: arn:aws:iam::176282227532:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS
+      Role: arn:aws:iam::176282227532:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS # 埋め込みたい
 
   ContentTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Cpu: 256
       Memory: 512
-      ExecutionRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS
+      ExecutionRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS # TODO 埋め込みたい
       RequiresCompatibilities:
         - FARGATE
       NetworkMode: awsvpc
       ContainerDefinitions:
-        - Name: stg-imedia-content
-          Image: 176282227532.dkr.ecr.ap-northeast-1.amazonaws.com/cw-imedia-api
+        - Name: !Sub '${Env}-${ServieName}-content'
+          Image: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/cw-imedia-api' # TODO ECRのイメージ名も埋め込みたい
           Memory: 256
           PortMappings:
             - ContainerPort: 80
@@ -79,14 +79,14 @@ Resources:
       TaskRoleArn: arn:aws:iam::176282227532:role/ECSTaskExecutionRole
       Tags:
         - Key: Name
-          Value: stg-imedia-taskdefinition
+          Value: !Sub '${Env}-${ServiceName}-taskdefinition'
 
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Type: application
       IpAddressType: ipv4
-      Name: stg-imedia-content
+      Name: !Sub '${Env}-${ServiceName}-content'
       Scheme: internet-facing
       SecurityGroups:
         - !ImportValue SecGroupAlb
@@ -95,7 +95,7 @@ Resources:
         - !ImportValue PublicSubnet2
       Tags:
         - Key: Name
-          Value: stg-imedia-content
+          Value: !Sub '${Env}-${ServiceName}-content'
 
   ALBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -103,7 +103,7 @@ Resources:
     Properties:
       IpAddressType: ipv4
       VpcId: !ImportValue VpcId
-      Name: stg-imedia-content
+      Name: !Sub '${Env}-${ServiceName}-content'
       Protocol: HTTP
       Port: 80
       TargetType: ip
@@ -114,7 +114,6 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 6
       HealthyThresholdCount: 5
-
 
   ALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener

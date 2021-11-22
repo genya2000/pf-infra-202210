@@ -10,7 +10,7 @@ Resources:
       EnableDnsSupport: true
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-vpc'
+          Value: !Sub '${Env}-${ServiceName}-vpc'
 
   ##### インターネットゲートウェイの作成 #####
   InternetGateway:
@@ -18,7 +18,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-igw'
+          Value: !Sub '${Env}-${ServiceName}-igw'
 
   ##### インターネットゲートウェイをVPCにアタッチ #####
   AttachGateway:
@@ -39,8 +39,10 @@ Resources:
       CidrBlock: 10.0.5.0/24
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-db-private-subnet-A'
+          Value: !Sub '${Env}-${ServiceName}-db-private-subnet-A'
 
+  DBPrivateSubnetB:
+    Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Select
         - 1
@@ -49,7 +51,7 @@ Resources:
       CidrBlock: 10.0.6.0/24
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-db-private-subnet-B'
+          Value: !Sub '${Env}-${ServiceName}-db-private-subnet-B'
 
   ECSPrivateSubnetA:
     Type: AWS::EC2::Subnet
@@ -61,7 +63,7 @@ Resources:
       CidrBlock: 10.0.7.0/24
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-ecs-private-subnet-A'
+          Value: !Sub '${Env}-${ServiceName}-ecs-private-subnet-A'
 
   ECSPrivateSubnetB:
     Type: AWS::EC2::Subnet
@@ -73,7 +75,7 @@ Resources:
       CidrBlock: 10.0.8.0/24
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-ecs-private-subnet-B'
+          Value: !Sub '${Env}-${ServiceName}-ecs-private-subnet-B'
 
   PublicSubnetA:
     Type: AWS::EC2::Subnet
@@ -85,7 +87,7 @@ Resources:
       CidrBlock: 10.0.9.0/24
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-public-subnet-A'
+          Value: !Sub '${Env}-${ServiceName}-public-subnet-A'
 
   PublicSubnetB:
     Type: AWS::EC2::Subnet
@@ -97,7 +99,7 @@ Resources:
       CidrBlock: 10.0.10.0/24
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-public-subnet-B'
+          Value: !Sub '${Env}-${ServiceName}-public-subnet-B'
 
 
   ##### ルートテーブルの作成 #####
@@ -107,7 +109,7 @@ Resources:
       VpcId: !Ref Vpc
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-private-routetable'
+          Value: !Sub '${Env}-${ServiceName}-private-routetable'
 
   PublicRouteTableA:
     Type: AWS::EC2::RouteTable
@@ -115,7 +117,7 @@ Resources:
       VpcId: !Ref Vpc
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-public-routetable-A'
+          Value: !Sub '${Env}-${ServiceName}-public-routetable-A'
 
   PublicRouteTableB:
     Type: AWS::EC2::RouteTable
@@ -123,7 +125,7 @@ Resources:
       VpcId: !Ref Vpc
       Tags:
         - Key: Name
-          Value: '{{resolve:ssm:/SwitchPlus/Env}}-{{resolve:ssm:/SwitchPlus/Name}}-public-routetable-B'
+          Value: !Sub '${Env}-${ServiceName}-public-routetable-B'
 
 
   ##### インターネットゲートウェイルートの作成 #####
@@ -188,19 +190,18 @@ Resources:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: stg-imedia-eip
+          Value: !Sub '${Env}-${ServiceName}-eip'
 
 
   ##### NATゲートウェイの作成 #####
   NatGateway:
     Type: AWS::EC2::NatGateway
-    DependsOn: EIP
     Properties:
       AllocationId: !GetAtt EIP.AllocationId
       SubnetId: !Ref PublicSubnetA
       Tags:
         - Key: Name
-          Value: stg-imedia-nat
+          Value: !Sub '${Env}-${ServiceName}-nat'
 
 
   ##### NATゲートウェイルートを作成 #####

@@ -42,10 +42,9 @@ Resources:
           ]
       }
       Roles:
-        - !Ref ECSServiceRole
+        - !Ref ECSTaskExecutionRole
 
-
-    ECSServiceTaskRoleForExecAccessToECS:
+  ECSServiceTaskRoleForExecAccessToECS:
     Type: AWS::IAM::Role
     Properties:
       RoleName: ECSServiceTaskRoleForExecAccessToECS
@@ -63,11 +62,10 @@ Resources:
       }
       Description: ECS ServiceRole
 
-
-    ECSServicePolicy:
+  ECSServiceTaskRolePolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: ECSServicePolicy
+      PolicyName: ECSServiceTaskRolePolicy
       PolicyDocument: {
           "Version": "2012-10-17",
           "Statement": [
@@ -96,5 +94,5 @@ Resources:
           ]
       }
       Roles:
-        - !Ref ECSServiceRole
+        - !Ref ECSServiceTaskRoleForExecAccessToECS
 
