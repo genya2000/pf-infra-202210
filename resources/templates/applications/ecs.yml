@@ -48,7 +48,7 @@ Resources:
       EnableExecuteCommand: true
       HealthCheckGracePeriodSeconds: 60
       TaskDefinition: !Ref ContentTaskDefinition
-      Role: arn:aws:iam::176282227532:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS # 埋め込みたい
+        # Role: arn:aws:iam::176282227532:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS # 埋め込みたい
 
   ContentTaskDefinition:
     Type: AWS::ECS::TaskDefinition
