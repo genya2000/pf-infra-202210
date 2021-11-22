@@ -124,7 +124,7 @@ Resources:
       TargetType: ip
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 60
-      HealthCheckPath: favicon.ico
+      HealthCheckPath: /favicon.ico
       HealthCheckPort: 80
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 6
