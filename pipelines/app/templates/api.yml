@@ -24,7 +24,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-api
-                BranchName: feature/IM-add_pipeline
+                BranchName: develop
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
@@ -66,7 +66,7 @@ Resources:
           - Type: PARAMETER_STORE
             Name: AWS_SECRET_ACCESS_KEY
             Value: /switch-plus/aws_secret_access_key
-          - Type: PARAMETER_STORE
+          - Type: PLAINTEXT
             Name: AWS_ACCOUNT_ID
             Value: !Ref AWS::AccountId
           - Type: PLAINTEXT

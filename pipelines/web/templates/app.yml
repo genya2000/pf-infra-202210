@@ -9,11 +9,9 @@ Parameters:
   Env:
     Type: String
     Default: stg
-    AllowedValue:
+    AllowedValues:
       - stg
       - prod
-
-
 
 Resources:
   AppPipeline:
@@ -39,7 +37,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-app
-                BranchName: feature/IM-add_pipeline
+                BranchName: develop
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
@@ -89,7 +87,7 @@ Resources:
             Value: stg
           - Type: PLAINTEXT
             Name: BUCKET
-            Value: stg-imedia-web
+            Value: stg-imedia-cms
           - Type: PLAINTEXT
             Name: DISTRIBUTION_ID
             Value: E24AL2VU6Y9Z97
