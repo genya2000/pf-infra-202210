@@ -6,7 +6,6 @@ help:
 	@echo ''
 	@echo '---------- CFnに関するコマンド ----------'
 	@echo 'lint           -- 引数に渡したテンプレートファイルの構文チェックを行います 例) make lint TMPL=main.yml'
-	@echo 'guard          -- 引数に渡したテンプレートファイルのセキュリティチェック・事前設定したルールに沿っているかチェックを行います 例) make guard TMPL=main.yml'
 	@echo 'rain           -- 引数に渡したテンプレートファイルを元にスタックをデプロイする 例) make rain TMPL=main.yml'
 	@echo 'rain-rm        -- 引数に渡したスタック名と一致するスタックを削除する 例) make rain-rm TMPL=main.yml '
 	@echo 'rain-ls        -- 作成済みスタックを一覧表示する 例) make rain-ls'
@@ -30,8 +29,6 @@ init:
 	@make docker-setup
 lint:
 	docker run -it --rm -v ${MAKEFILE_DIR}:/var/www/workdir -w /var/www/workdir cfn-lint:latest cfn-lint ${TMPL}
-guard:
-	docker run -it --rm -v ${MAKEFILE_DIR}:/var/www/workdir -w /var/www/workdir cfn-guard:latest cfn-guard ${TMPL}
 rain:
 	docker run -it --rm -v ${HOME}/.aws:/root/.aws -v ${MAKEFILE_DIR}:/var/www/workdir -w /var/www/workdir rain:latest deploy ${TMPL}
 rain-rm:
