@@ -2,11 +2,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: SwitchPlus Api Pipeline Template
 
 Parameters:
-  ServiceName:
-    Type: String
-    Default: switch_plus
-    Description: Enter service name
-
   Env:
     Type: String
     Default: stg

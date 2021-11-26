@@ -2,10 +2,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: SwitchPlus Main Template in App
 
 Parameters:
-  ServiceName:
-    Type: String
-    Default: switch-plus
-
   Env:
     Type: String
     Default: stg
