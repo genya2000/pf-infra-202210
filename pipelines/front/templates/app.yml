@@ -13,18 +13,18 @@ Resources:
   AppPipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: stg-app-pipeline
+      Name: !Sub '${Env}-app-pipeline'
       ArtifactStore:
         Type: S3
         Location: switch-plus-infra
       RestartExecutionOnUpdate: false
-      RoleArn: arn:aws:iam::176282227532:role/CodePipelineServiceRole
+      RoleArn: !ImportValue CodePipelineServiceRole
       Stages:
 
       ##### Sourceステージ #####
-        - Name: AppSource
+        - Name: !Sub '${Env}-AppSource'
           Actions:
-            - Name: app-source
+            - Name: !Sub '${Env}-app-source'
               Region: ap-northeast-1
               ActionTypeId:
                 Category: Source
@@ -37,13 +37,13 @@ Resources:
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
-                - Name: appBuildArtifact
+                - Name: !Sub '${Env}-AppBuildArtifact'
               RunOrder: 1
 
       ##### Buildステージ #####
-        - Name: AppBuild
+        - Name: !Sub '${Env}-AppBuild'
           Actions:
-            - Name: app-build
+            - Name: !Sub '${Env}-app-source'
               Region: ap-northeast-1
               ActionTypeId:
                 Category: Build
@@ -51,14 +51,12 @@ Resources:
                 Provider: CodeBuild
                 Version: 1
               Configuration:
-                ProjectName: !Ref AppBuildProject
+                ProjectName: !Ref AppBuild
               InputArtifacts:
-                - Name: appBuildArtifact
-              OutputArtifacts:
-                - Name: appTestArtifact
+                - Name: !Sub '${Env}-AppBuildArtifact'
               RunOrder: 1
 
-  AppBuildProject:
+  AppBuild:
     Type: AWS::CodeBuild::Project
     Properties:
       Artifacts:
@@ -80,14 +78,14 @@ Resources:
             Value: !Ref AWS::Region
           - Type: PLAINTEXT
             Name: ENV
-            Value: stg
+            Value: !Ref Env
           - Type: PLAINTEXT
             Name: BUCKET
             Value: stg-imedia-cms
           - Type: PLAINTEXT
             Name: DISTRIBUTION_ID
             Value: E24AL2VU6Y9Z97
-      ServiceRole: arn:aws:iam::176282227532:role/CodeBuildServiceRole
+      ServiceRole: !ImportValue CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE
         BuildSpec: .buildspec.yml
