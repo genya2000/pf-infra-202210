@@ -134,7 +134,7 @@ Resources:
     Properties:
       PolicyName: CodePipelinePolicy
       PolicyDocument: {
-          "Version": "2012-10-17"
+          "Version": "2012-10-17",
           "Statement": [
               {
                   "Action": [
@@ -182,8 +182,8 @@ Outputs:
   CodePipelineServiceRole:
     Value: !GetAtt CodePipelineServiceRole.Arn
     Export:
-      Name: CodePipelineServiceRole:
+      Name: CodePipelineServiceRole
   CodeBuildServiceRole:
     Value: !GetAtt CodeBuildServiceRole.Arn
     Export:
-      Name:   CodeBuildServiceRole
+      Name: CodeBuildServiceRole
