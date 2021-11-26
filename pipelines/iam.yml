@@ -177,3 +177,13 @@ Resources:
       }
       Roles:
         - !Ref CodePipelineServiceRole
+
+Outputs:
+  CodePipelineServiceRole:
+    Value: !GetAtt CodePipelineServiceRole.Arn
+    Export:
+      Name: CodePipelineServiceRole:
+  CodeBuildServiceRole:
+    Value: !GetAtt CodeBuildServiceRole.Arn
+    Export:
+      Name:   CodeBuildServiceRole

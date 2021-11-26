@@ -19,18 +19,18 @@ Resources:
   ApiPipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: stg-api-pipeline
+      Name: !Sub '${Env}-api-pipeline'
       ArtifactStore:
         Type: S3
         Location: switch-plus-infra
       RestartExecutionOnUpdate: false
-      RoleArn: arn:aws:iam::176282227532:role/CodePipelineServiceRole
+      RoleArn: !ImportValue CodePipelineServiceRole
       Stages:
 
       ##### Sourceステージ #####
         - Name: ApiSource
           Actions:
-            - Name: api-source
+            - Name: !Sub '${Env}-api-source'
               Region: ap-northeast-1
               ActionTypeId:
                 Category: Source
@@ -43,13 +43,13 @@ Resources:
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
-                - Name: apiBuildArtifact
+                - Name: !Sub '${Env}-ApiBuildArtifact'
               RunOrder: 1
 
       ##### Buildステージ #####
         - Name: ApiBuild
           Actions:
-            - Name: api-build-image
+            - Name: !Sub '${Env}-api-build'
               Region: ap-northeast-1
               ActionTypeId:
                 Category: Build
@@ -57,14 +57,12 @@ Resources:
                 Provider: CodeBuild
                 Version: 1
               Configuration:
-                ProjectName: !Ref ApiImageBuildProject
+                ProjectName: !Ref ApiImageBuild
               InputArtifacts:
-                - Name: apiBuildArtifact
-              OutputArtifacts:
-                - Name: apiTestArtifact
+                - Name: !Sub '${Env}-ApiBuildArtifact'
               RunOrder: 1
 
-  ApiImageBuildProject:
+  ApiImageBuild:
     Type: AWS::CodeBuild::Project
     Properties:
       Artifacts:
@@ -92,11 +90,11 @@ Resources:
             Value: switch-plus
           - Type: PLAINTEXT
             Name: ENV
-            Value: stg
+            Value: !Ref Env
           - Type: PLAINTEXT
             Name: IMAGE_NAME
             Value: cw-imedia-api
-      ServiceRole: arn:aws:iam::176282227532:role/CodeBuildServiceRole
+      ServiceRole: !ImportValue CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE
         BuildSpec: .buildspec.yml
