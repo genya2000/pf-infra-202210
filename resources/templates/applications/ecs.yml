@@ -49,14 +49,13 @@ Resources:
       EnableECSManagedTags: true
       EnableExecuteCommand: true
       HealthCheckGracePeriodSeconds: 60
-        # Role: arn:aws:iam::176282227532:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS # 埋め込みたい
 
   ContentTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Cpu: 256
       Memory: 512
-      ExecutionRoleArn: arn:aws:iam::176282227532:role/ECSTaskExecutionRole # TODO 埋め込みたい
+      ExecutionRoleArn: !ImportValue ECSTaskExecutionRole
       RequiresCompatibilities:
         - FARGATE
       NetworkMode: awsvpc
@@ -92,7 +91,7 @@ Resources:
           #     - Name: MACKEREL_APIKEY
           #       Value: # TODO API_KEY
           #   Essential: false
-      TaskRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS
+      TaskRoleArn: !ImportValue ECSServiceTaskRoleForExecAccessToECS
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-taskdefinition'
