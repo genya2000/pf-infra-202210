@@ -98,11 +98,11 @@ Resources:
 
 Outputs:
   ECSTaskExecutionRole:
-    Value: !Ref ECSTaskExecutionRole.Arn
+    Value: !GetAtt ECSTaskExecutionRole.Arn
     Export:
       Name: ECSTaskExecutionRole
   ECSServiceTaskRolePolicy:
-    Value: !Ref ECSServiceTaskRoleForExecAccessToECS.Arn
+    Value: !GetAtt ECSServiceTaskRoleForExecAccessToECS.Arn
     Export:
       Name: ECSServiceTaskRoleForExecAccessToECS
 
