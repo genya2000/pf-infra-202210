@@ -1,15 +1,13 @@
 #!/bin/bash
 
-mountdir=/var/www/workdir
-workingdir=$mountdir/templates
+workingdir=/var/www
 dockerimage=cfn-diagram:latest
-dirname=$(echo $1 | tr -d .yml)
 
 docker run \
     -it \
     --rm \
-    -v $PWD:$mountdir/ \
+    -v $PWD:$workingdir \
     -w $workingdir \
-    $dockerimage cfn-dia html -t $workingdir/$1 -o $mountdir/outputs/$dirname
+    $dockerimage cfn-dia html -t diagram.yml -o outputs
 
-open $PWD/outputs/$dirname/index.html
+open $PWD/outputs/index.html
