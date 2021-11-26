@@ -20,22 +20,17 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ./iam.yml
-      Parameters:
-        Env: !Ref Env
-        ServiceName: !Ref ServiceName
 
   Api:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ./back/api.yml
+      TemplateURL: ./back/templates/api.yml
       Parameters:
         Env: !Ref Env
-        ServiceName: !Ref ServiceName
 
   App:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ./front/app.yml
+      TemplateURL: ./front/templates/app.yml
       Parameters:
         Env: !Ref Env
-        ServiceName: !Ref ServiceName
