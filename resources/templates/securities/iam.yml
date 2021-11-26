@@ -96,3 +96,13 @@ Resources:
       Roles:
         - !Ref ECSServiceTaskRoleForExecAccessToECS
 
+Outputs:
+  ECSTaskExecutionRole:
+    Value: !Ref ECSTaskExecutionRole
+    Export:
+      Name: ECSTaskExecutionRole
+  ECSServiceTaskRolePolicy:
+    Value: !Ref ECSServiceTaskRolePolicy
+    Export:
+      Name: ECSServiceTaskRolePolicy
+
