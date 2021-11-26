@@ -102,7 +102,7 @@ Outputs:
     Export:
       Name: ECSTaskExecutionRole
   ECSServiceTaskRolePolicy:
-    Value: !Ref ECSServiceTaskRolePolicy
+    Value: !Ref ECSServiceTaskRoleForExecAccessToECS
     Export:
-      Name: ECSServiceTaskRolePolicy
+      Name: ECSServiceTaskRoleForExecAccessToECS
 
