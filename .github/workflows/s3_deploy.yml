@@ -16,3 +16,6 @@ jobs:
       - name: s3 sync resources
         working-directory: resources/templates
         run: aws s3 sync . s3://switch-plus-infra/resources/templates/ --delete --exclude main.yml --exclude diagram.yml
+      - name: s3 sync pipelines
+        working-directory: pipelines
+        run: aws s3 sync . s3://switch-plus-infra/pipelines --delete --exclude outputs/* --exclude diagram.yml --exclude pipeline.yml --exclude output_diagram.sh
