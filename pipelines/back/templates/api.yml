@@ -10,6 +10,9 @@ Parameters:
       - prod
     Description: Enter stg or prod
 
+Conditions:
+  IsProd: !Equals [!Ref Env, 'prod']
+
 Resources:
   ApiPipeline:
     Type: AWS::CodePipeline::Pipeline
@@ -34,7 +37,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-api
-                BranchName: develop
+                BranchName: !If [IsProd, 'master', 'develop']
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
@@ -45,7 +48,7 @@ Resources:
         - Name: ApiBuild
           Actions:
             - Name: !Sub '${Env}-api-build'
-              Region: ap-northeast-1
+              Region: !Ref AWS::Region
               ActionTypeId:
                 Category: Build
                 Owner: AWS
