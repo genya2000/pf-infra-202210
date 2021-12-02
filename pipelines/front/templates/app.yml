@@ -9,6 +9,9 @@ Parameters:
       - stg
       - prod
 
+Conditions:
+  IsProd: !Equals [!Ref Env, 'prod']
+
 Resources:
   AppPipeline:
     Type: AWS::CodePipeline::Pipeline
@@ -33,7 +36,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-app
-                BranchName: develop
+                BranchName: !If [IsProd, 'master', 'develop']
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
@@ -44,7 +47,7 @@ Resources:
         - Name: !Sub '${Env}-AppBuild'
           Actions:
             - Name: !Sub '${Env}-app-source'
-              Region: ap-northeast-1
+              Region: !Ref AWS::Region
               ActionTypeId:
                 Category: Build
                 Owner: AWS
