@@ -15,7 +15,7 @@ help:
 	@echo 'exec           -- 引数に渡した情報を元にコンテナ内で /bin/sh を実行する 例) make exec CLUSTER=クラスター名 TASK=タスクID CONTAINER=コンテナ名'
 	@echo 'exec-migrate   -- 引数に渡した情報を元にコンテナ内で マイグレーション・シード を実行する 例) make exec-migrate CLUSTER=クラスター名 TASK=タスクID CONTAINER=コンテナ名'
 	@echo 'get-tasks      -- 引数に渡した情報を元にクラスター内のタスク情報をJSONで取得する 例) make get-tasks --cluster=クラスター名'
-	@echo 'stop-task      -- 引数に渡した情報を元にタスクを停止する 例) make stop-task CLUSTER=クラスター名 TASK=タスクID'
+	@echo 'restart-task   -- 引数に渡した情報を元にタスクを停止する。DisireCountが1になっている場合は、停止後自動でコンテナが一つ立ち上がるので実質タスク再構築 例) make stop-task CLUSTER=クラスター名 TASK=タスクID'
 	@echo ''
 	@echo '---------- Gitに関するコマンド ----------'
 	@echo 'git-setup      -- Gitのローカル環境のuser.nameとuser.emailを設定します'
@@ -45,7 +45,7 @@ describe:
 	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs describe-services --cluster ${CLUSTER} --services ${SERVICE} --query services\[0\].enableExecuteCommand
 get-tasks:
 	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs list-tasks --cluster ${CLUSTER}
-stop-task:
+restart-task:
 	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs stop-task --cluster=${CLUSTER} --task ${TASK}
 git-setup:
 	$(shell ./.make/setup_git.sh)
