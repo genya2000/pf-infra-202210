@@ -15,10 +15,13 @@ Parameters:
       - prod
     Description: Enter stg or prod
 
+Conditions:
+  IsProd: !Equals [!Ref Env, 'prod']
+
 Resources:
 
   ##### CloudFront Distribution の作成 #####
-  distribution:
+  ContentDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
