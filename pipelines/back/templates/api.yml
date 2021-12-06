@@ -84,12 +84,6 @@ Resources:
             Name: AWS_REGION
             Value: !Ref AWS::Region
           - Type: PLAINTEXT
-            Name: BUCKET
-            Value: switch-plus
-          - Type: PLAINTEXT
-            Name: ENV
-            Value: !Ref Env
-          - Type: PLAINTEXT
             Name: IMAGE_NAME
             Value: !Sub '${Env}-cw-imedia-api'
       ServiceRole: !ImportValue CodeBuildServiceRole
