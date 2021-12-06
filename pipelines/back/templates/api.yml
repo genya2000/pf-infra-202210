@@ -91,7 +91,7 @@ Resources:
             Value: !Ref Env
           - Type: PLAINTEXT
             Name: IMAGE_NAME
-            Value: cw-imedia-api
+            Value: !Sub '${Env}-cw-imedia-api'
       ServiceRole: !ImportValue CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE

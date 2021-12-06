@@ -84,7 +84,7 @@ Resources:
             Value: !Ref Env
           - Type: PLAINTEXT
             Name: BUCKET
-            Value: stg-imedia-cms
+            Value: !Sub '${Env}-imedia-cms'
           - Type: PLAINTEXT
             Name: DISTRIBUTION_ID
             Value: E24AL2VU6Y9Z97
