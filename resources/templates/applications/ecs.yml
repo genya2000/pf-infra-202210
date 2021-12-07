@@ -72,8 +72,8 @@ Resources:
               Protocol: tcp
           Essential: true
           EnvironmentFiles:
-            Type: s3
-            Value: !Sub 'arn:aws:s3:::switch-plus/env/${Env}/cw-imedia-api/.env'
+            - Type: s3
+              Value: !Sub 'arn:aws:s3:::switch-plus/env/${Env}/cw-imedia-api/.env'
             # LogConfiguration:
             #   LogDriver: awslogs
             #   Options:
