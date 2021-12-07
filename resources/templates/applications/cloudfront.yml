@@ -21,6 +21,8 @@ Conditions:
 Resources:
 
   ##### CloudFront Distribution の作成 #####
+  # ※カスタムオリジンの設定はCloudFrontでは対応していない
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html#cfn-cloudfront-distribution-distributionconfig
   ContentDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -55,7 +57,7 @@ Resources:
           FunctionAssociations: !If
             - IsStg
             # CFへのリクエスト時にBasic認証をおこなう
-            - EventType:
+            - EventType: viewer-request
               FunctionARN:
                 Fn::GetAtt:
                   - BasicAuthCloudFrontFunction
