@@ -36,17 +36,17 @@ rain-rm:
 rain-ls:
 	docker run -it --rm -v ${HOME}/.aws:/root/.aws -w /var/www/workdir rain:latest list
 executable:
-	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs update-service --cluster ${CLUSTER} --service ${SERVICE} --enable-execute-command
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-cli:latest ecs update-service --cluster ${CLUSTER} --service ${SERVICE} --enable-execute-command
 exec:
-	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs execute-command --interactive --cluster ${CLUSTER} --task ${TASK} --container ${CONTAINER}  --command /bin/sh
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-cli:latest ecs execute-command --interactive --cluster ${CLUSTER} --task ${TASK} --container ${CONTAINER}  --command /bin/sh
 exec-migrate:
-	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs execute-command --interactive --cluster ${CLUSTER} --task ${TASK} --container ${CONTAINER}  --command 'php artisan migrate --seed'
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-cli:latest ecs execute-command --interactive --cluster ${CLUSTER} --task ${TASK} --container ${CONTAINER}  --command 'php artisan migrate --seed'
 describe:
-	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs describe-services --cluster ${CLUSTER} --services ${SERVICE} --query services\[0\].enableExecuteCommand
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-cli:latest ecs describe-services --cluster ${CLUSTER} --services ${SERVICE} --query services\[0\].enableExecuteCommand
 get-tasks:
-	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs list-tasks --cluster ${CLUSTER}
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-cli:latest ecs list-tasks --cluster ${CLUSTER}
 restart-task:
-	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-ecs-exec:latest ecs stop-task --cluster=${CLUSTER} --task ${TASK}
+	docker run -it --rm -v ${HOME}/.aws:/root/.aws aws-cli:latest ecs stop-task --cluster=${CLUSTER} --task ${TASK}
 git-setup:
 	$(shell ./.make/setup_git.sh)
 docker-setup:

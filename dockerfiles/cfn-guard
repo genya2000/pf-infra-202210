@@ -1,5 +1,0 @@
-FROM alpine:3.13.6
-
-RUN apk --update add --no-cache cargo
-RUN cargo install cfn-guard
-ENV PATH "/root/.cargo/bin:${PATH}"
