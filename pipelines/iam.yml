@@ -21,10 +21,10 @@ Resources:
       Description: CodeBuild ServiceRole
 
 
-  CodeBuildExecuteGitPullPolicy:
+  CodeBuildPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: CodeBuildExecuteGitPullPolicy
+      PolicyName: CodeBuildPolicy
       PolicyDocument: {
           "Version": "2012-10-17",
           "Statement": [
