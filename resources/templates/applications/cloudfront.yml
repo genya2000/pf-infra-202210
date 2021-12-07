@@ -30,9 +30,9 @@ Resources:
         IPV6Enabled: false
         Origins:
           - Id: S3Origin
-            DomainName: stg-imedia-cms.s3.ap-northeast-1.amazonaws.com
+            DomainName: !Sub '${Env}-imedia-cms.s3.ap-northeast-1.amazonaws.com'
             S3OriginConfig:
-              OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
         DefaultRootObject: index.html
         CustomErrorResponses:
           - ErrorCachingMinTTL: 0
@@ -90,8 +90,8 @@ Resources:
           var request = event.request;
           var headers = request.headers;
 
-          var authUser = '{{resolve:ssm:/switch-plus/basic_user}}';
-          var authPass = '{{resolve:ssm:/switch-plus/basic_pass}}';
+          var authUser = '{{resolve:ssm:/switch-plus/stg/basic_user}}';
+          var authPass = '{{resolve:ssm:/switch-plus/stg/basic_pass}}';
           var tmp = authUser + ':' + authPass;
           var authString = 'Basic ' + tmp.toString('base64');
 
@@ -116,30 +116,12 @@ Resources:
   AssetsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: stg-imedia-cms
+      Bucket: !Sub '${Env}-imedia-cms'
       PolicyDocument:
         Statement:
           - Action: s3:GetObject
             Effect: Allow
-            Resource: !Sub arn:aws:s3:::stg-imedia-cms/*
+            Resource: !Sub 'arn:aws:s3:::${Env}-imedia-cms/*'
             Principal:
               AWS: !Sub arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}
-
-        #   CachePolicy:
-        #     Type: AWS::CloudFront::CachePolicy
-        #     Properties:
-        #       CachePolicyConfig:
-        #         DefaultTTL: 100
-        #         MaxTTL: 31536000
-        #         MinTTL: 86400
-        #         Name: !Sub '${Env}-${ServiceName}-cachepolicy'
-        #         ParametersInCacheKeyAndForwardedToOrigin:
-        #           CookiesConfig:
-        #             CookieBehavior: all
-        #           EnableAcceptEncodingBrotli: false
-        #           EnableAcceptEncodingGzip: false
-        #           HeadersConfig:
-        #             HeaderBehavior: whitelist
-        #           QueryStringsConfig:
-        #             QueryStringBehavior: all
 

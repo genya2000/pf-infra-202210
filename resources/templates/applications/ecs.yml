@@ -73,21 +73,21 @@ Resources:
           Essential: true
           EnvironmentFile:
             Type: s3
-            Value: !Sub 'arn:aws:s3:::switch-plus/${Env}/cw-imedia-api/.env'
+            Value: !Sub 'arn:aws:s3:::switch-plus/env/${Env}/cw-imedia-api/.env'
             # LogConfiguration:
             #   LogDriver: awslogs
             #   Options:
 
 
         # mackerelコンテナ定義
-          # - Name: stg-imedia-mackerel-agent
+          # - Name: !Sub '${Env}-content-mackerel-agent'
           #   Image: mackerel/mackerel-container-agent:latest
           #   Cpu: 256
           #   Memory: 128
           #   DisableNetworking: true
           #   DependsOn:
           #     - Condition: COMPLETE
-          #       ContainerName: stg-imedia-content
+          #       ContainerName: !Sub '${Env}-content-mackerel'
           #   Environment:
           #     - Name: ACKEREL_CONTAINER_PLATFORM
           #       Value: ecs_v3

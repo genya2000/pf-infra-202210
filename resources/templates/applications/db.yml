@@ -27,8 +27,8 @@ Resources:
       DBSubnetGroupName: !Ref DBSubnetGroup
       DatabaseName: switch_plus
       DeletionProtection: false
-      MasterUsername: switchplus #'{{resolve:ssm:/switch-plus/master_username}}'
-      MasterUserPassword: SwitchStg1122 # '{{resolve:ssm:/switch-plus/master_userpass}}'
+      MasterUsername: !Sub '{{resolve:ssm-secure:/switch-plus/${Env}/master_username}}'
+      MasterUserPassword: !Sub '{{resolve:ssm-secure:/switch-plus/${Env}/master_userpass}}'
       Port: 3306
       VpcSecurityGroupIds:
         - !ImportValue SecGroupDb
@@ -64,7 +64,7 @@ Resources:
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
-      DBSubnetGroupDescription:  Staging Imedia DB Subnet Group
+      DBSubnetGroupDescription: Staging Imedia DB Subnet Group
       SubnetIds:
         - !ImportValue DBPrivateSubnetA
         - !ImportValue DBPrivateSubnetB

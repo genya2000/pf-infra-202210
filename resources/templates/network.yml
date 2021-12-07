@@ -42,7 +42,6 @@ Resources:
       VpcId: !Ref Vpc
       InternetGatewayId: !Ref InternetGateway
 
-
   ##### サブネットの作成 #####
   DBPrivateSubnetA:
     Type: AWS::EC2::Subnet
