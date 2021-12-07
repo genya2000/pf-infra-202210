@@ -71,10 +71,10 @@ Resources:
         Type: LINUX_CONTAINER
         PrivilegedMode: true
         EnvironmentVariables:
-          - Type: SECRETS_MANAGER
+          - Type: PARAMETER_STORE
             Name: AWS_ACCESS_KEY
             Value: /switch-plus/aws_access_key
-          - Type: SECRETS_MANAGER
+          - Type: PARAMETER_STORE
             Name: AWS_SECRET_ACCESS_KEY
             Value: /switch-plus/aws_secret_access_key
           - Type: PLAINTEXT
