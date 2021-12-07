@@ -140,7 +140,8 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn: !Ref LoadBalancer
-      CertificateArn: arn:aws:acm:ap-northeast-1:176282227532:certificate/e0a91fd8-94a0-4c4c-b6d7-a8d2713fee27
+      Certificates:
+        - CertificateArn: arn:aws:acm:ap-northeast-1:176282227532:certificate/e0a91fd8-94a0-4c4c-b6d7-a8d2713fee27
       Protocol: HTTP
       Port: 80
       DefaultActions:
