@@ -74,7 +74,7 @@ Resources:
               HostPort: 443
               Protocol: tcp
           Essential: true
-          EnvironmentFile:
+          EnvironmentFiles:
             Type: s3
             Value: !Sub 'arn:aws:s3:::switch-plus/env/${Env}/cw-imedia-api/.env'
             # LogConfiguration:
