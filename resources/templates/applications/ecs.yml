@@ -150,7 +150,7 @@ Resources:
   DomainAssociateToALB:
      Type: AWS::Route53::RecordSet
      Properties:
-       HostedZoneName: !If [IsProd, 'api.switch-plus.jp', 'api.stg.switch-plus.jp']
+       HostedZoneId: !If [IsProd, 'Z05201981AKVBUG7RCC19', 'Z00113692O48K074V1ZHW']
        Name: !If [IsProd, 'api.switch-plus.jp', 'api.stg.switch-plus.jp']
        Type: A
        AliasTarget:
