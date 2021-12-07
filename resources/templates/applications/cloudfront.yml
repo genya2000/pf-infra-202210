@@ -16,7 +16,7 @@ Parameters:
     Description: Enter stg or prod
 
 Conditions:
-  IsProd: !Equals [!Ref Env, 'prod']
+  IsStg: !Equals [!Ref Env, 'stg']
 
 Resources:
 
@@ -52,13 +52,15 @@ Resources:
             - DELETE
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
-          FunctionAssociations:
+          FunctionAssociations: !If
+            - IsStg
             # CFへのリクエスト時にBasic認証をおこなう
-            - EventType: viewer-request
+            - EventType:
               FunctionARN:
                 Fn::GetAtt:
                   - BasicAuthCloudFrontFunction
                   - FunctionARN
+            - !Ref AWS::NoValue
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
             # CloudFrontDefaultCertificate: !If [IsProd, false, true]
@@ -80,6 +82,7 @@ Resources:
   ##### CloudFrontDistributionに対する Functionの作成 (ステージング環境のみ) #####
   BasicAuthCloudFrontFunction:
     Type: AWS::CloudFront::Function
+    Conditions: IsStg
     Properties:
       AutoPublish: true
       FunctionCode: |
