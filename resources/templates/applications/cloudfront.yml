@@ -23,7 +23,7 @@ Resources:
   ##### CloudFront Distribution の作成 #####
   # ※カスタムオリジンの設定はCloudFrontでは対応していない
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html#cfn-cloudfront-distribution-distributionconfig
-  ContentDistribution:
+  distribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
