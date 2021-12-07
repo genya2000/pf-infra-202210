@@ -38,6 +38,24 @@ Resources:
                       "logs:PutLogEvents"
                   ],
                   "Resource": "*"
+              },
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "s3:GetObject"
+                  ],
+                  "Resource": [
+                      "arn:aws:s3:::switch-plus/env/*"
+                  ]
+              },
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "s3:GetBucketLocation"
+                  ],
+                  "Resource": [
+                      "arn:aws:s3:::switch-plus"
+                  ]
               }
           ]
       }
