@@ -15,6 +15,9 @@ Parameters:
       - prod
     Description: Enter stg or prod
 
+Conditions:
+  IsProd: !Equals [!Ref Env, 'prod']
+
 Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
