@@ -84,7 +84,7 @@ Resources:
   ##### CloudFrontDistributionに対する Functionの作成 (ステージング環境のみ) #####
   BasicAuthCloudFrontFunction:
     Type: AWS::CloudFront::Function
-    Conditions: IsStg
+    Condition: IsStg
     Properties:
       AutoPublish: true
       FunctionCode: |
