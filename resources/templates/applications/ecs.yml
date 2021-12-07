@@ -62,7 +62,7 @@ Resources:
       RequiresCompatibilities:
         - FARGATE
       NetworkMode: awsvpc
-      ContainerDefinitions:
+      ContainerDefinition:
         - Name: !Sub '${Env}-content'
           Image: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Env}-cw-imedia-api'
           Memory: 256
