@@ -137,9 +137,20 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn: !Ref LoadBalancer
+      CertificateArn: arn:aws:acm:ap-northeast-1:176282227532:certificate/e0a91fd8-94a0-4c4c-b6d7-a8d2713fee27
       Protocol: HTTP
       Port: 80
       DefaultActions:
         - TargetGroupArn: !Ref ALBTargetGroup
           Type: forward
+
+  DomainAssociateToALB:
+     Type: AWS::Route53::RecordSet
+     Properties:
+       HostedZoneName: !If [IsProd, 'api.switch-plus.jp', 'api.stg.switch-plus.jp']
+       Name: !If [IsProd, 'api.switch-plus.jp', 'api.stg.switch-plus.jp']
+       Type: A
+       AliasTarget:
+         DNSName: !GetAtt LoadBalancer.DNSName
+         HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneNameID
 

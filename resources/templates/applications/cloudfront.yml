@@ -91,7 +91,7 @@ Resources:
           var headers = request.headers;
 
           var authUser = '{{resolve:ssm:/switch-plus/stg/basic_user}}';
-          var authPass = '{{resolve:ssm:/switch-plus/stg/basic_pass}}';
+          var authPass = '{{resolve:ssm-secure:/switch-plus/stg/basic_pass}}';
           var tmp = authUser + ':' + authPass;
           var authString = 'Basic ' + tmp.toString('base64');
 
