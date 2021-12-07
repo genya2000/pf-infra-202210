@@ -54,15 +54,9 @@ Resources:
             - DELETE
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
-          FunctionAssociations: !If
-            - IsStg
-            # CFへのリクエスト時にBasic認証をおこなう
-            - EventType: viewer-request
-              FunctionARN:
-                Fn::GetAtt:
-                  - BasicAuthCloudFrontFunction
-                  - FunctionARN
-            - !Ref AWS::NoValue
+          FunctionAssociations: 
+            - EventType: !If [IsStg, 'viewer-request', !Ref 'AWS::NoValue']
+              FunctionARN: !If [IsStg, !GetAtt BasicAuthCloudFrontFunction.FunctionARN, !Ref 'AWS::NoValue']
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
             # CloudFrontDefaultCertificate: !If [IsProd, false, true]
