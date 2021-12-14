@@ -37,7 +37,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-admin
-                BranchName: !If [IsProd, 'master', 'develop']
+                BranchName: !If [IsProd, 'master', 'feature/add_pipeline']
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
