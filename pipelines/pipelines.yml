@@ -11,14 +11,8 @@ Parameters:
     Description: Enter stg or prod
 
 Resources:
-  IAM:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/pipelines/iam.yml
-
   Api:
     Type: AWS::CloudFormation::Stack
-    DependsOn: IAM
     Properties:
       TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/pipelines/back/templates/api.yml
       Parameters:
@@ -26,7 +20,6 @@ Resources:
 
   App:
     Type: AWS::CloudFormation::Stack
-    DependsOn: IAM
     Properties:
       TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/pipelines/front/templates/app.yml
       Parameters:
@@ -34,7 +27,6 @@ Resources:
 
   Admin:
     Type: AWS::CloudFormation::Stack
-    DependsOn: IAM
     Properties:
       TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/pipelines/back/templates/admin.yml
       Parameters:
