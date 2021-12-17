@@ -21,7 +21,7 @@ Resources:
         Type: S3
         Location: switch-plus-infra
       RestartExecutionOnUpdate: false
-      RoleArn: !ImportValue CodePipelineServiceRole
+      RoleArn: arn:aws:iam::176282227532:role/CodePipelineServiceRole
       Stages:
 
       ##### Sourceステージ #####
@@ -88,7 +88,7 @@ Resources:
           - Type: PLAINTEXT
             Name: DISTRIBUTION_ID
             Value: E24AL2VU6Y9Z97
-      ServiceRole: !ImportValue CodeBuildServiceRole
+      ServiceRole: arn:aws:iam::176282227532:role/CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE
         BuildSpec: .buildspec.yml
