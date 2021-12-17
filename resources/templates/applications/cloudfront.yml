@@ -54,7 +54,7 @@ Resources:
             - DELETE
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
-          FunctionAssociations: 
+          FunctionAssociations:
             - EventType: !If [IsStg, 'viewer-request', !Ref 'AWS::NoValue']
               FunctionARN: !If [IsStg, !GetAtt BasicAuthCloudFrontFunction.FunctionARN, !Ref 'AWS::NoValue']
         ViewerCertificate:
