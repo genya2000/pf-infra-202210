@@ -197,58 +197,34 @@ Resources:
 
 
   ##### NAGゲートウェイ用EIPの作成 #####
-  EIPA:
+  EIP:
     Type: AWS::EC2::EIP
     DependsOn: AttachGateway
     Properties:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: !Sub '${Env}-${ServiceName}-eip-a'
+          Value: !Sub '${Env}-${ServiceName}-eip'
 
-            #  EIPB:
-            #    Type: AWS::EC2::EIP
-            #    DependsOn: AttachGateway
-            #    Properties:
-            #      Domain: vpc
-            #      Tags:
-            #        - Key: Name
-            #          Value: !Sub '${Env}-${ServiceName}-eip-b'
 
   ##### NATゲートウェイの作成 #####
-  NatGatewayA:
+  NatGateway:
     Type: AWS::EC2::NatGateway
     Properties:
-      AllocationId: !GetAtt EIPA.AllocationId
+      AllocationId: !GetAtt EIP.AllocationId
       SubnetId: !Ref PublicSubnetA
       Tags:
         - Key: Name
-          Value: !Sub '${Env}-${ServiceName}-nat-a'
+          Value: !Sub '${Env}-${ServiceName}-nat'
 
-            #  NatGatewayB:
-            #    Type: AWS::EC2::NatGateway
-            #    Properties:
-            #      AllocationId: !GetAtt EIPB.AllocationId
-            #      SubnetId: !Ref PublicSubnetB
-            #      Tags:
-            #        - Key: Name
-            #          Value: !Sub '${Env}-${ServiceName}-nat-b'
 
   ##### NATゲートウェイルートを作成 #####
-  NatGatewayRouteA:
+  NatGatewayRoute:
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NatGatewayA
+      NatGatewayId: !Ref NatGateway
       RouteTableId: !Ref PrivateRouteTable
-
-        #  NatGatewayRouteB:
-        #    Type: AWS::EC2::Route
-        #    Properties:
-        #      DestinationCidrBlock: 0.0.0.0/0
-        #      NatGatewayId: !Ref NatGatewayB
-        #      RouteTableId: !Ref PrivateRouteTable
-
 
 Outputs:
   VpcId:

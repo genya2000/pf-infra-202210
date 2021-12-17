@@ -45,11 +45,11 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - !ImportValue !Sub '${Env}-SecGroupECSBefore'
-            - !ImportValue !Sub '${Env}-SecGroupECSAfter'
+            - !ImportValue SecGroupECSBefore
+            - !ImportValue SecGroupECSAfter
           Subnets:
-            - !ImportValue !Sub '${Env}-ECSPrivateSubnetA'
-            - !ImportValue !Sub '${Env}-ECSPrivateSubnetB'
+            - !ImportValue ECSPrivateSubnetA
+            - !ImportValue ECSPrivateSubnetB
       EnableECSManagedTags: true
       EnableExecuteCommand: true
       HealthCheckGracePeriodSeconds: 60
@@ -108,10 +108,10 @@ Resources:
       Scheme: internet-facing
       IpAddressType: ipv4
       Subnets:
-        - !ImportValue !Sub '${Env}-PublicSubnetA'
-        - !ImportValue !Sub '${Env}-PublicSubnetB'
+        - !ImportValue PublicSubnetA
+        - !ImportValue PublicSubnetB
       SecurityGroups:
-        - !ImportValue !Sub '${Env}-SecGroupAlb'
+        - !ImportValue SecGroupAlb
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-content'
@@ -125,7 +125,7 @@ Resources:
       Protocol: HTTP
       Port: 80
       IpAddressType: ipv4
-      VpcId: !ImportValue !Sub '${Env}-VpcId'
+      VpcId: !ImportValue VpcId
       HealthCheckEnabled: true
       HealthCheckProtocol: HTTP
       HealthCheckPort: 80
