@@ -29,7 +29,7 @@ Resources:
 
   ContentService:
     Type: AWS::ECS::Service
-    DependsOn: ContentALBTargetGroup
+    DependsOn: ContentALBListener
     Properties:
       LaunchType: FARGATE
       TaskDefinition: !Ref ContentTaskDefinition
