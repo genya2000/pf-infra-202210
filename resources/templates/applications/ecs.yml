@@ -153,6 +153,6 @@ Resources:
        Name: !If [IsProd, 'api.switch-plus.jp', 'api.stg.switch-plus.jp']
        Type: A
        AliasTarget:
-         DNSName: !GetAtt LoadBalancer.DNSName
-         HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+         DNSName: !GetAtt ContentLoadBalancer.DNSName
+         HostedZoneId: !GetAtt ContentLoadBalancer.CanonicalHostedZoneID
 
