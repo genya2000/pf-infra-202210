@@ -58,7 +58,7 @@ Resources:
     Properties:
       Cpu: 256
       Memory: 512
-      ExecutionRoleArn: !ImportValue ECSTaskExecutionRole
+      ExecutionRoleArn: arn:aws:iam::176282227532:role/ECSTaskExecutionRole
       RequiresCompatibilities:
         - FARGATE
       NetworkMode: awsvpc
@@ -94,7 +94,7 @@ Resources:
           #     - Name: MACKEREL_APIKEY
           #       Value: # TODO API_KEY
           #   Essential: false
-      TaskRoleArn: !ImportValue ECSServiceTaskRoleForExecAccessToECS
+      TaskRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-taskdefinition'
