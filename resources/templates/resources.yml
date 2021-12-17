@@ -4,7 +4,7 @@ Description: SwitchPlus Main Template
 Parameters:
   ServiceName:
     Type: String
-    Default: switch_plus
+    Default: switchplus
     Description: Enter service name
 
   Env:
