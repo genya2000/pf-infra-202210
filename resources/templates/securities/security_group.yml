@@ -22,7 +22,7 @@ Resources:
     Properties:
       GroupName: !Sub '${Env}-${ServiceName}-ecs-secgroup-before'
       GroupDescription: security group for ecs
-      VpcId: !ImportValue VpcId
+      VpcId: !ImportValue !Sub '${Env}-VpcId'
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-ecs-secgroup-before'
@@ -32,7 +32,7 @@ Resources:
     Properties:
       GroupName: !Sub '${Env}-${ServiceName}-db-secgroup'
       GroupDescription: security group for db
-      VpcId: !ImportValue VpcId
+      VpcId: !ImportValue !Sub '${Env}-VpcId'
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 3306
@@ -47,7 +47,7 @@ Resources:
     Properties:
       GroupName: !Sub '${Env}-${ServiceName}-ecs-secgroup-after'
       GroupDescription: security group for ecs
-      VpcId: !ImportValue VpcId
+      VpcId: !ImportValue !Sub '${Env}-VpcId'
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -72,7 +72,7 @@ Resources:
     Properties:
       GroupName: !Sub '${Env}-${ServiceName}-alb-secgroup'
       GroupDescription: security group for alb
-      VpcId: !ImportValue VpcId
+      VpcId: !ImportValue !Sub '${Env}-VpcId'
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
