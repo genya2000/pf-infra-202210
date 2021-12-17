@@ -230,28 +230,28 @@ Outputs:
   VpcId:
     Value: !Ref Vpc
     Export:
-      Name: VpcId
+      Name: !Sub '${Env}-VpcId'
   DBPrivateSubnetA:
     Value: !Ref DBPrivateSubnetA
     Export:
-      Name: DBPrivateSubnetA
+      Name: !Sub '${Env}-DBPrivateSubnetA'
   DBPrivateSubnetB:
     Value: !Ref DBPrivateSubnetB
     Export:
-      Name: DBPrivateSubnetB
+      Name: !Sub '${Env}-DBPrivateSubnetB'
   ECSPrivateSubnetA:
     Value: !Ref ECSPrivateSubnetA
     Export:
-      Name: ECSPrivateSubnetA
+      Name: !Sub '${Env}-ECSPrivateSubnetA'
   ECSPrivateSubnetB:
     Value: !Ref ECSPrivateSubnetB
     Export:
-      Name: ECSPrivateSubnetB
+      Name: !Sub '${Env}-ECSPrivateSubnetB'
   PublicSubnetA:
     Value: !Ref PublicSubnetA
     Export:
-      Name: PublicSubnetA
+      Name: !Sub '${Env}-PublicSubnetA'
   PublicSubnetB:
     Value: !Ref PublicSubnetB
     Export:
-      Name: PublicSubnetB
+      Name: !Sub '${Env}-PublicSubnetB'

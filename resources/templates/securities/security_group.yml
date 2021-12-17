@@ -99,16 +99,16 @@ Outputs:
   SecGroupECSBefore:
     Value: !Ref EcsSecurityGroupBefore
     Export:
-      Name: SecGroupECSBefore
+      Name: !Sub '${Env}-SecGroupECSBefore'
   SecGroupECSAfter:
     Value: !Ref EcsSecurityGroupAfter
     Export:
-      Name: SecGroupECSAfter
+      Name: !Sub '${Env}-SecGroupECSAfter'
   SecGroupDb:
     Value: !Ref DBSecurityGroup
     Export:
-      Name: SecGroupDb
+      Name: !Sub '${Env}-SecGroupDb'
   SecGroupAlb:
     Value: !Ref AlbSecurityGroup
     Export:
-      Name: SecGroupAlb
+      Name: !Sub '${Env}-SecGroupAlb'
