@@ -29,6 +29,7 @@ Resources:
 
   ContentService:
     Type: AWS::ECS::Service
+    DependsOn: ContentALBTargetGroup
     Properties:
       LaunchType: FARGATE
       TaskDefinition: !Ref ContentTaskDefinition
@@ -39,7 +40,7 @@ Resources:
       LoadBalancers:
         - ContainerName: !Sub '${Env}-content'
           ContainerPort: 80
-          TargetGroupArn: !Ref ALBTargetGroup
+          TargetGroupArn: !Ref ContentALBTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
@@ -99,7 +100,7 @@ Resources:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-taskdefinition'
 
-  LoadBalancer:
+  ContentLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Type: application
@@ -115,9 +116,9 @@ Resources:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-content'
 
-  ALBTargetGroup:
+  ContentALBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    DependsOn: LoadBalancer
+    DependsOn: ContentLoadBalancer
     Properties:
       TargetType: ip
       Name: !Sub '${Env}-content'
