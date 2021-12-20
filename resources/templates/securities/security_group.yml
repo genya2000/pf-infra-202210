@@ -22,7 +22,8 @@ Resources:
     Properties:
       GroupName: !Sub '${Env}-${ServiceName}-ecs-secgroup-before'
       GroupDescription: security group for ecs
-      VpcId: !ImportValue VpcId
+      VpcId:
+        Fn::ImportValue: !Sub '${Env}-VpcId'
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-ecs-secgroup-before'
@@ -32,7 +33,8 @@ Resources:
     Properties:
       GroupName: !Sub '${Env}-${ServiceName}-db-secgroup'
       GroupDescription: security group for db
-      VpcId: !ImportValue VpcId
+      VpcId:
+        Fn::ImportValue: !Sub '${Env}-VpcId'
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 3306
@@ -47,7 +49,8 @@ Resources:
     Properties:
       GroupName: !Sub '${Env}-${ServiceName}-ecs-secgroup-after'
       GroupDescription: security group for ecs
-      VpcId: !ImportValue VpcId
+      VpcId:
+        Fn::ImportValue: !Sub '${Env}-VpcId'
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -72,7 +75,8 @@ Resources:
     Properties:
       GroupName: !Sub '${Env}-${ServiceName}-alb-secgroup'
       GroupDescription: security group for alb
-      VpcId: !ImportValue VpcId
+      VpcId:
+        Fn::ImportValue: !Sub '${Env}-VpcId'
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -95,20 +99,54 @@ Resources:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-alb-secgroup'
 
+  AdminAlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${Env}-${ServiceName}-admin-alb-secgroup'
+      GroupDescription: security group for alb
+      VpcId:
+        Fn::ImportValue: !Sub '${Env}-VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0 # Profuture, GizumoのIPアドレスのみにする
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0 # Profuture, GizumoのIPアドレスのみにする
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          DestinationSecurityGroupId: !Ref EcsSecurityGroupAfter
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          DestinationSecurityGroupId: !Ref EcsSecurityGroupAfter
+      Tags:
+        - Key: Name
+          Value: !Sub '${Env}-${ServiceName}-alb-secgroup'
+
+
 Outputs:
   SecGroupECSBefore:
     Value: !Ref EcsSecurityGroupBefore
     Export:
-      Name: SecGroupECSBefore
+      Name: !Sub '${Env}-SecGroupECSBefore'
   SecGroupECSAfter:
     Value: !Ref EcsSecurityGroupAfter
     Export:
-      Name: SecGroupECSAfter
+      Name: !Sub '${Env}-SecGroupECSAfter'
   SecGroupDb:
     Value: !Ref DBSecurityGroup
     Export:
-      Name: SecGroupDb
+      Name: !Sub '${Env}-SecGroupDb'
   SecGroupAlb:
     Value: !Ref AlbSecurityGroup
     Export:
-      Name: SecGroupAlb
+      Name: !Sub '${Env}-SecGroupAlb'
+  AdminSecGroupAlb:
+    Value: !Ref AdminAlbSecurityGroup
+    Export:
+      Name: !Sub '${Env}-AdminSecGroupAlb'
