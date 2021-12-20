@@ -84,10 +84,10 @@ Resources:
             Value: !Ref Env
           - Type: PLAINTEXT
             Name: BUCKET
-            Value: !Sub '${Env}-imedia-cms'
+            Value: !Sub '${Env}-switch-plus-cms'
           - Type: PLAINTEXT
             Name: DISTRIBUTION_ID
-            Value: E24AL2VU6Y9Z97
+            Value: !If [IsProd, '', 'E2NH5TL7QPJFQN']
       ServiceRole: arn:aws:iam::176282227532:role/CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE
