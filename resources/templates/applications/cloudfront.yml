@@ -55,10 +55,12 @@ Resources:
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
         ViewerCertificate:
-          CloudFrontDefaultCertificate: true
-            # CloudFrontDefaultCertificate: !If [IsProd, false, true]
-            # SslSupportMethod: 'sni-only'
-            # AcmCertificateArn: !If [IsProd, !Sub 'arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/${SSLCertificateId}', '']
+          SslSupportMethod: 'sni-only'
+          AcmCertificateArn: !If [
+            IsStg,
+            !Sub 'arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/84e89707-1d47-4b58-a1e2-4bc13a214951',
+            !Sub 'arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/2092b2b3-823f-4d48-9713-04ef3b3e0944'
+          ]
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-distribution'
