@@ -36,7 +36,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-app
-                BranchName: !If [IsProd, 'master', 'develop']
+                BranchName: !If [IsProd, 'test_prod', 'develop']
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
