@@ -85,7 +85,7 @@ Resources:
             Value: !Ref AWS::Region
           - Type: PLAINTEXT
             Name: IMAGE_NAME
-            Value: !Sub '${Env}-cw-imedia-api'
+            Value: !Sub '${Env}-switch-plus-api'
       ServiceRole: arn:aws:iam::176282227532:role/CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE
