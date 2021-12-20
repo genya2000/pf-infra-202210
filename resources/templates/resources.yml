@@ -59,7 +59,7 @@ Resources:
         Env: !Ref Env
         ServiceName: !Ref ServiceName
 
-  ECS-Admin:
+  ECSAdmin:
     Type: AWS::CloudFormation::Stack
     DependsOn: [Network, Security]
     Properties:
