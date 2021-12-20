@@ -19,7 +19,7 @@ Conditions:
   IsProd: !Equals [!Ref Env, 'prod']
 
 Resources:
-  ECSCluster:
+  AdminECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: !Sub '${Env}-admin'
@@ -34,8 +34,7 @@ Resources:
       LaunchType: FARGATE
       TaskDefinition: !Ref AdminTaskDefinition
       PlatformVersion: 1.4.0
-      Cluster:
-        Fn::ImportValue: !Sub '${Env}-ECSCluster'
+      Cluster: !Ref AdminECSCluster
       ServiceName: !Sub '${Env}-admin'
       DesiredCount: 1
       LoadBalancers:
