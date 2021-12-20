@@ -75,6 +75,11 @@ Resources:
           EnvironmentFiles:
             - Type: s3
               Value: !Sub 'arn:aws:s3:::switch-plus/env/${Env}/cw-imedia-admin/.env'
+      TaskRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS
+      Tags:
+        - Key: Name
+          Value: !Sub '${Env}-${ServiceName}-admin-taskdefinition'
+
 
   AdminLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer

@@ -98,7 +98,7 @@ Resources:
       TaskRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS
       Tags:
         - Key: Name
-          Value: !Sub '${Env}-${ServiceName}-taskdefinition'
+          Value: !Sub '${Env}-${ServiceName}-content-taskdefinition'
 
   ContentLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
