@@ -32,7 +32,7 @@ Resources:
         IPV6Enabled: false
         Origins:
           - Id: S3Origin
-            DomainName: !Sub '${Env}-imedia-cms.s3.ap-northeast-1.amazonaws.com'
+            DomainName: !Sub '${Env}-switch-plus-cms.s3.ap-northeast-1.amazonaws.com'
             S3OriginConfig:
               OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
         DefaultRootObject: index.html
@@ -111,12 +111,12 @@ Resources:
   AssetsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Sub '${Env}-imedia-cms'
+      Bucket: !Sub '${Env}-switch-plus-cms'
       PolicyDocument:
         Statement:
           - Action: s3:GetObject
             Effect: Allow
-            Resource: !Sub 'arn:aws:s3:::${Env}-imedia-cms/*'
+            Resource: !Sub 'arn:aws:s3:::${Env}-switch-plus-cms/*'
             Principal:
               AWS: !Sub arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}
 
