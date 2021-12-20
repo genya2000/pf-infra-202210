@@ -31,7 +31,7 @@ Resources:
       MasterUserPassword: !Sub '{{resolve:ssm-secure:/switch-plus/${Env}/db_master_userpass}}'
       Port: 3306
       VpcSecurityGroupIds:
-        - Fn::ImportValue: !Sub '${Env}-SecGroupDb'
+        - !ImportValue SecGroupDb
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-cluster'
@@ -66,8 +66,8 @@ Resources:
     Properties:
       DBSubnetGroupDescription: Staging Imedia DB Subnet Group
       SubnetIds:
-        - Fn::ImportValue: !Sub '${Env}-DBPrivateSubnetA'
-        - Fn::ImportValue: !Sub '${Env}-DBPrivateSubnetB'
+        - !ImportValue DBPrivateSubnetA
+        - !ImportValue DBPrivateSubnetB
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-db-subnet-group'

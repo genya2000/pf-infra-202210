@@ -45,11 +45,11 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - Fn::ImportValue: !Sub '${Env}-SecGroupECSBefore'
-            - Fn::ImportValue: !Sub '${Env}-SecGroupECSAfter'
+            - !ImportValue SecGroupECSBefore
+            - !ImportValue SecGroupECSAfter
           Subnets:
-            - Fn::ImportValue: !Sub '${Env}-ECSPrivateSubnetA'
-            - Fn::ImportValue: !Sub '${Env}-ECSPrivateSubnetB'
+            - !ImportValue ECSPrivateSubnetA
+            - !ImportValue ECSPrivateSubnetB
       EnableECSManagedTags: true
       EnableExecuteCommand: true
       HealthCheckGracePeriodSeconds: 60
@@ -108,10 +108,10 @@ Resources:
       Scheme: internet-facing
       IpAddressType: ipv4
       Subnets:
-        - Fn::ImportValue: !Sub '${Env}-PublicSubnetA'
-        - Fn::ImportValue: !Sub '${Env}-PublicSubnetB'
+        - !ImportValue PublicSubnetA
+        - !ImportValue PublicSubnetB
       SecurityGroups:
-        - Fn::ImportValue: !Sub '${Env}-SecGroupAlb'
+        - !ImportValue SecGroupAlb
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-content'
@@ -125,8 +125,7 @@ Resources:
       Protocol: HTTP
       Port: 80
       IpAddressType: ipv4
-      VpcId:
-        Fn::ImportValue: !Sub '${Env}-VpcId'
+      VpcId: !ImportValue VpcId
       HealthCheckEnabled: true
       HealthCheckProtocol: HTTP
       HealthCheckPort: 80
@@ -157,8 +156,3 @@ Resources:
          DNSName: !GetAtt ContentLoadBalancer.DNSName
          HostedZoneId: !GetAtt ContentLoadBalancer.CanonicalHostedZoneID
 
-Outputs:
-  ECSCluster:
-    Value: !Ref ECSCluster
-    Export:
-      Name: !Sub '${Env}-ECSCluster'
