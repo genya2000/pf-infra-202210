@@ -65,7 +65,7 @@ Resources:
       NetworkMode: awsvpc
       ContainerDefinitions:
         - Name: !Sub '${Env}-content'
-          Image: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Env}-cw-imedia-api'
+          Image: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Env}-switch-plus-api'
           Memory: 256
           PortMappings:
             - ContainerPort: 80
