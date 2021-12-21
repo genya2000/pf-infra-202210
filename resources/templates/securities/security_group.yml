@@ -126,8 +126,36 @@ Resources:
           DestinationSecurityGroupId: !Ref EcsSecurityGroupAfter
       Tags:
         - Key: Name
-          Value: !Sub '${Env}-${ServiceName}-alb-secgroup'
+          Value: !Sub '${Env}-${ServiceName}-batch-alb-secgroup'
 
+  BatchAlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${Env}-${ServiceName}-batch-alb-secgroup'
+      GroupDescription: security group for alb
+      VpcId:
+        Fn::ImportValue: !Sub '${Env}-VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0 # Profuture, GizumoのIPアドレス, APIコンテナのみにする
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/00 # Profuture, GizumoのIPアドレス, APIコンテナのみにする
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          DestinationSecurityGroupId: !Ref EcsSecurityGroupAfter
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          DestinationSecurityGroupId: !Ref EcsSecurityGroupAfter
+      Tags:
+        - Key: Name
+          Value: !Sub '${Env}-${ServiceName}-batch-alb-secgroup'
 
 Outputs:
   SecGroupECSBefore:
@@ -150,3 +178,7 @@ Outputs:
     Value: !Ref AdminAlbSecurityGroup
     Export:
       Name: !Sub '${Env}-AdminSecGroupAlb'
+  BatchSecGroupAlb:
+    Value: !Ref BatchAlbSecurityGroup
+    Export:
+      Name: !Sub '${Env}-BatchSecGroupAlb'
