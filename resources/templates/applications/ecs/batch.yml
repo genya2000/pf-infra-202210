@@ -130,7 +130,7 @@ Resources:
   DomainAssociateToBatchALB:
      Type: AWS::Route53::RecordSet
      Properties:
-       HostedZoneId: !If [IsProd, 'Z036337037KTOWDNZ1RJI', 'Z0363373389CV7HGT8KCM']
+       HostedZoneId: !If [IsProd, 'Z0177204Z1QORSYMYUJY', 'Z01775893BUW4TMUUSEYY']
        Name: !If [IsProd, 'batch.switch-plus.jp', 'batch.stg.switch-plus.jp']
        Type: A
        AliasTarget:
