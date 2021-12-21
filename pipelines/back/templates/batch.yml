@@ -1,103 +1,93 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: SwitchPlus Main Template in App
+Description: SwitchPlus Batch Pipeline Template
 
 Parameters:
-  DBInstanceClass:
+  Env:
     Type: String
-    Default: db.t3.small
+    Default: stg
     AllowedValues:
-      - db.t3.small
-      - db.t3.medium
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+Conditions:
+  IsProd: !Equals [!Ref Env, 'prod']
 
 Resources:
-  SSMParamServiceName:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Type: String
-      Name: /SwitchPlus/Name
-      Value: !Ref ServiceName
-
-  AppPipeline:
+  BatchPipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: stg-app-pipeline
+      Name: !Sub '${Env}-batch-pipeline'
       ArtifactStore:
         Type: S3
         Location: switch-plus-infra
       RestartExecutionOnUpdate: false
-      RoleArn: # 必須
+      RoleArn: arn:aws:iam::176282227532:role/CodePipelineServiceRole
       Stages:
 
       ##### Sourceステージ #####
-        - Name: ApiSource
+        - Name: BatchSource
           Actions:
             - Name: source-api
-              Namespace: SwitchPlus # Optional
+              Region: ap-northeast-1
               ActionTypeId:
                 Category: Source
                 Owner: AWS
                 Provider: CodeCommit
                 Version: 1
               Configuration:
-                RepositoryName: cw-imedia-api
-                BranchName: master
+                RepositoryName: cw-imedia-batch
+                BranchName: !If [IsProd, 'master', 'feature/chore_add_rundeck_execution']
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
-              InputArtifacts:
-                - Name: appInput
               OutputArtifacts:
-                - Name: appOutput
-              Region: ap-northeast-1
+                - Name: !Sub '${Env}-BatchBuildArtifact'
               RunOrder: 1
 
       ##### Buildステージ #####
-        - Name: ApiBuild
+        - Name: BatchBuild
           Actions:
-            - Name: build-api
-              Namespace: SwitchPlus # Optional
+            - Name: !Sub '${Env}-batch-build'
+              Region: !Ref AWS::Region
               ActionTypeId:
-                Category: Source
+                Category: Build
                 Owner: AWS
-                Provider: CodeCommit
+                Provider: CodeBuild
                 Version: 1
               Configuration:
-                RepositoryName: cw-imedia-api
-                BranchName: master
-                PollForSourceChanges: true
-                OutputArtifactFormat: CODEBUILD_CLONE_REF
+                ProjectName: !Ref BatchImageBuild
               InputArtifacts:
-                - Name: appInput
-              OutputArtifacts:
-                - Name: appOutput
-              Region: ap-northeast-1
+                - Name: !Sub '${Env}-BatchBuildArtifact'
               RunOrder: 1
 
-      ##### Deployステージ #####
-        - Name: ApiDeploy
-          Actions:
-            - Name: deploy-api
-              Namespace: SwitchPlus # Optional
-              ActionTypeId:
-                Category: Source
-                Owner: AWS
-                Provider: CodeCommit
-                Version: 1
-              Configuration:
-                RepositoryName: cw-imedia-api
-                BranchName: master
-                PollForSourceChanges: true
-                OutputArtifactFormat: CODEBUILD_CLONE_REF
-              InputArtifacts:
-                - Name: appInput
-              OutputArtifacts:
-                - Name: appOutput
-              Region: ap-northeast-1
-              RunOrder: 1
-      Tags:
-        - Key: Name
-          Value: stg-app-pipeline
 
-Outputs:
-  MyPipelineVersion:
-    Value: !GetAtt MyPipeline.Version
-
+  BatchImageBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:5.0
+        Type: LINUX_CONTAINER
+        PrivilegedMode: true
+        EnvironmentVariables:
+          - Type: PARAMETER_STORE
+            Name: AWS_ACCESS_KEY
+            Value: /switch-plus/aws_access_key
+          - Type: PARAMETER_STORE
+            Name: AWS_SECRET_ACCESS_KEY
+            Value: /switch-plus/aws_secret_access_key
+          - Type: PLAINTEXT
+            Name: AWS_ACCOUNT_ID
+            Value: !Ref AWS::AccountId
+          - Type: PLAINTEXT
+            Name: AWS_REGION
+            Value: !Ref AWS::Region
+          - Type: PLAINTEXT
+            Name: IMAGE_NAME
+            Value: !Sub '${Env}-switch-plus-batch'
+      ServiceRole: arn:aws:iam::176282227532:role/CodeBuildServiceRole
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: .buildspec.yml
