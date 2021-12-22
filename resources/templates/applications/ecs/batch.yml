@@ -103,6 +103,7 @@ Resources:
       HealthCheckEnabled: true
       HealthCheckProtocol: HTTP
       HealthCheckPort: 4440
+      HealthCheckPath: /user/login
       HealthCheckIntervalSeconds: 120
       HealthCheckTimeoutSeconds: 6
       HealthyThresholdCount: 5
