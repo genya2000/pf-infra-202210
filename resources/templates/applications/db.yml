@@ -55,7 +55,7 @@ Resources:
       Description: !Sub '${Env} Imedia DB Parameter Group'
       Family: aurora-mysql5.7
       Parameters:
-        max_allowed_packet: 1024
+        max_allowed_packet: 100000
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-db-parameter-group'
