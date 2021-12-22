@@ -50,7 +50,7 @@ Resources:
   BatchTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Cpu: 256
+      Cpu: 1024
       Memory: 1024
       ExecutionRoleArn: arn:aws:iam::176282227532:role/ECSTaskExecutionRole
       RequiresCompatibilities:
