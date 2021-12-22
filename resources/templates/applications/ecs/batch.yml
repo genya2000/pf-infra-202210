@@ -51,7 +51,7 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Cpu: 1024
-      Memory: 1024
+      Memory: 2048
       ExecutionRoleArn: arn:aws:iam::176282227532:role/ECSTaskExecutionRole
       RequiresCompatibilities:
         - FARGATE
@@ -59,7 +59,7 @@ Resources:
       ContainerDefinitions:
         - Name: !Sub '${Env}-batch'
           Image: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Env}-switch-plus-batch'
-          Memory: 1024
+          Memory: 2048
           PortMappings:
             - ContainerPort: 4440
               HostPort: 4440
