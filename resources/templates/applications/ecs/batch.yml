@@ -39,7 +39,7 @@ Resources:
       DesiredCount: 1
       LoadBalancers:
         - ContainerName: !Sub '${Env}-batch'
-          ContainerPort: 80
+          ContainerPort: 4440
           TargetGroupArn: !Ref BatchALBTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -68,8 +68,8 @@ Resources:
           Image: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Env}-switch-plus-batch'
           Memory: 256
           PortMappings:
-            - ContainerPort: 80
-              HostPort: 80
+            - ContainerPort: 4440
+              HostPort: 4440
               Protocol: tcp
           Essential: true
           EnvironmentFiles:
