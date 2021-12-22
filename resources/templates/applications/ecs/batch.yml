@@ -59,7 +59,7 @@ Resources:
       ContainerDefinitions:
         - Name: !Sub '${Env}-batch'
           Image: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Env}-switch-plus-batch'
-          Memory: 256
+          Memory: 512
           PortMappings:
             - ContainerPort: 4440
               HostPort: 4440
