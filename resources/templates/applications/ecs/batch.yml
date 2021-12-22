@@ -103,14 +103,13 @@ Resources:
       TargetType: ip
       Name: !Sub '${Env}-batch'
       Protocol: HTTP
-      Port: 80
+      Port: 4440
       IpAddressType: ipv4
       VpcId: 
         Fn::ImportValue: !Sub '${Env}-VpcId'
       HealthCheckEnabled: true
       HealthCheckProtocol: HTTP
-      HealthCheckPort: 80
-      HealthCheckPath: /favicon.ico
+      HealthCheckPort: 4440
       HealthCheckIntervalSeconds: 60
       HealthCheckTimeoutSeconds: 6
       HealthyThresholdCount: 5

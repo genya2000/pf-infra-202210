@@ -137,21 +137,13 @@ Resources:
         Fn::ImportValue: !Sub '${Env}-VpcId'
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
+          FromPort: 4440
+          ToPort: 4440
           CidrIp: 0.0.0.0/0 # Profuture, GizumoのIPアドレス, APIコンテナのみにする
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/00 # Profuture, GizumoのIPアドレス, APIコンテナのみにする
       SecurityGroupEgress:
         - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          DestinationSecurityGroupId: !Ref EcsSecurityGroupAfter
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
+          FromPort: 4440
+          ToPort: 4440
           DestinationSecurityGroupId: !Ref EcsSecurityGroupAfter
       Tags:
         - Key: Name
