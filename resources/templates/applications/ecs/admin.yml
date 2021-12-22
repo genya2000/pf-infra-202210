@@ -19,14 +19,6 @@ Conditions:
   IsProd: !Equals [!Ref Env, 'prod']
 
 Resources:
-  AdminECSCluster:
-    Type: AWS::ECS::Cluster
-    Properties:
-      ClusterName: !Sub '${Env}-admin'
-      Tags:
-        - Key: Name
-          Value: !Sub '${Env}-${ServiceName}-admin'
-
   AdminService:
     Type: AWS::ECS::Service
     DependsOn: AdminALBListener
@@ -34,7 +26,8 @@ Resources:
       LaunchType: FARGATE
       TaskDefinition: !Ref AdminTaskDefinition
       PlatformVersion: 1.4.0
-      Cluster: !Ref AdminECSCluster
+      Cluster:
+        Fn::ImportValue: !Sub '${Env}-ECSCluster'
       ServiceName: !Sub '${Env}-admin'
       DesiredCount: 1
       LoadBalancers:

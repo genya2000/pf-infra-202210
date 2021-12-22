@@ -19,14 +19,6 @@ Conditions:
   IsProd: !Equals [!Ref Env, 'prod']
 
 Resources:
-  BatchECSCluster:
-    Type: AWS::ECS::Cluster
-    Properties:
-      ClusterName: !Sub '${Env}-batch'
-      Tags:
-        - Key: Name
-          Value: !Sub '${Env}-${ServiceName}-batch'
-
   BatchService:
     Type: AWS::ECS::Service
     DependsOn: BatchALBListener
@@ -34,7 +26,8 @@ Resources:
       LaunchType: FARGATE
       TaskDefinition: !Ref BatchTaskDefinition
       PlatformVersion: 1.4.0
-      Cluster: !Ref BatchECSCluster
+      Cluster:
+        Fn::ImportValue: !Sub '${Env}-ECSCluster'
       ServiceName: !Sub '${Env}-batch'
       DesiredCount: 1
       LoadBalancers:

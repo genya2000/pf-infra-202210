@@ -19,14 +19,6 @@ Conditions:
   IsProd: !Equals [!Ref Env, 'prod']
 
 Resources:
-  ECSCluster:
-    Type: AWS::ECS::Cluster
-    Properties:
-      ClusterName: !Sub '${Env}-content'
-      Tags:
-        - Key: Name
-          Value: !Sub '${Env}-${ServiceName}-content'
-
   ContentService:
     Type: AWS::ECS::Service
     DependsOn: ContentALBListener
@@ -34,7 +26,8 @@ Resources:
       LaunchType: FARGATE
       TaskDefinition: !Ref ContentTaskDefinition
       PlatformVersion: 1.4.0
-      Cluster: !Ref ECSCluster
+      Cluster:
+        Fn::ImportValue: !Sub '${Env}-ECSCluster'
       ServiceName: !Sub '${Env}-content'
       DesiredCount: 1
       LoadBalancers:
