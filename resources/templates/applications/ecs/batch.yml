@@ -69,7 +69,7 @@ Resources:
             - Type: s3
               Value: !Sub 'arn:aws:s3:::switch-plus/env/${Env}/cw-imedia-batch/.env'
         - Name: !Sub '${Env}-batch-mackerel-agent'
-          Image: mackerel/mackerel-container-agent:latest
+          Image: public.ecr.aws/mackerel/mackerel-container-agent:latest
           Memory: 128
           Environment:
             - Name: MACKEREL_CONTAINER_PLATFORM
@@ -124,8 +124,8 @@ Resources:
       Certificates:
         - CertificateArn: !If [
           IsProd,
-          'arn:aws:acm:ap-northeast-1:176282227532:certificate/aa91ee9b-15fb-49b5-9155-52f3c3900e86',
-          'arn:aws:acm:ap-northeast-1:176282227532:certificate/e0a91fd8-94a0-4c4c-b6d7-a8d2713fee27'
+          'arn:aws:acm:ap-northeast-1:176282227532:certificate/e0a91fd8-94a0-4c4c-b6d7-a8d2713fee27',
+          'arn:aws:acm:ap-northeast-1:176282227532:certificate/aa91ee9b-15fb-49b5-9155-52f3c3900e86'
         ]
       Protocol: HTTPS
       Port: 443
