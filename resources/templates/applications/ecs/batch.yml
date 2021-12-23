@@ -45,7 +45,7 @@ Resources:
             - Fn::ImportValue: !Sub '${Env}-ECSPrivateSubnetB'
       EnableECSManagedTags: true
       EnableExecuteCommand: true
-      HealthCheckGracePeriodSeconds: 120
+      HealthCheckGracePeriodSeconds: 300
 
   BatchTaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -104,7 +104,7 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckPort: 4440
       HealthCheckPath: /user/login
-      HealthCheckIntervalSeconds: 120
+      HealthCheckIntervalSeconds: 60
       HealthCheckTimeoutSeconds: 6
       HealthyThresholdCount: 5
 
