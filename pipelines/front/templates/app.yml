@@ -87,7 +87,7 @@ Resources:
             Value: !Sub '${Env}-switch-plus-cms'
           - Type: PLAINTEXT
             Name: DISTRIBUTION_ID
-            Value: !If [IsProd, '', 'E2NH5TL7QPJFQN']
+            Value: !If [IsProd, '', 'E2RXQ9MWLKM7ZK']
       ServiceRole: arn:aws:iam::176282227532:role/CodeBuildServiceRole
       Source:
         Type: CODEPIPELINE
