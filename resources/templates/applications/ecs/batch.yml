@@ -45,7 +45,7 @@ Resources:
             - Fn::ImportValue: !Sub '${Env}-ECSPrivateSubnetB'
       EnableECSManagedTags: true
       EnableExecuteCommand: true
-      HealthCheckGracePeriodSeconds: 300
+      HealthCheckGracePeriodSeconds: 420
 
   BatchTaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -104,8 +104,8 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckPort: 4440
       HealthCheckPath: /user/login
-      HealthCheckIntervalSeconds: 60
-      HealthCheckTimeoutSeconds: 6
+      HealthCheckIntervalSeconds: 120
+      HealthCheckTimeoutSeconds: 10
       HealthyThresholdCount: 5
 
         #  BasicAuthenticateFunctionTargetGroup:
@@ -149,7 +149,32 @@ Resources:
       Runtime: nodejs14.x
       Code:
         ZipFile: |
+          exports.handler = async (event, context) => {
+              const headers = event.headers || {};
 
+              // ALB Health check
+              if (headers['user-agent'] === 'ELB-HealthChecker/2.0') {
+                  return {
+                      statusCode: 200,
+                      statusDescription: '200 OK',
+                      isBase64Encoded: false,
+                      headers: {
+                          'Content-Type': 'text/html'
+                      }
+                  };
+              }
+
+              return {
+                  statusCode: 401,
+                  statusDescription: '401 Unauthorized',
+                  body: 'Unauthorized',
+                  isBase64Encoded: false,
+                  headers: {
+                      'WWW-Authenticate': 'Basic',
+                      'Content-Type': 'text/html'
+                  }
+              };
+          };
       Environment:
         Variables:
           BASIC_USER: !Sub '{{resolve:ssm:/switch-plus/${Env}/basic_user}}'
