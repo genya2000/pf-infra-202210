@@ -108,6 +108,16 @@ Resources:
       HealthCheckTimeoutSeconds: 6
       HealthyThresholdCount: 5
 
+        #  BasicAuthenticateFunctionTargetGroup:
+        #    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+        #    DependsOn: [BatchLoadBalancer]
+        #    Properties:
+        #      Name: !Sub '${Env}-batch-lambda'
+        #      TargetType: lambda
+        #      Targets:
+        #        - Id: !GetAtt BasicAuthenticateFunction.Arn
+        #      HealthCheckEnabled: false
+
   BatchALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -129,4 +139,23 @@ Resources:
        AliasTarget:
          DNSName: !GetAtt BatchLoadBalancer.DNSName
          HostedZoneId: !GetAtt BatchLoadBalancer.CanonicalHostedZoneID
+
+  BasicAuthenticateFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: BasicAuthentication
+      Handler: index.Handler
+      Role: !ImportValue LambdaExecutionRole
+      Runtime: nodejs14.x
+      Code:
+        ZipFile: |
+
+      Environment:
+        Variables:
+          BASIC_USER: !Sub '{{resolve:ssm:/switch-plus/${Env}/basic_user}}'
+          BASIC_PASS: !Sub '{{resolve:ssm:/switch-plus/${Env}/basic_pass}}'
+      Description: Invoke function when access to batch domein
+      Tags:
+        - Key: Name
+          Value: basic-authentication
 
