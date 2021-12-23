@@ -37,7 +37,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-admin
-                BranchName: !If [IsProd, 'test_t  nprod', 'feature/test_chore_stg_environment_setup']
+                BranchName: !If [IsProd, 'test_prod', 'develop']
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
