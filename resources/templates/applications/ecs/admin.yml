@@ -68,6 +68,15 @@ Resources:
           EnvironmentFiles:
             - Type: s3
               Value: !Sub 'arn:aws:s3:::switch-plus/env/${Env}/cw-imedia-admin/.env'
+        - Name: !Sub '${Env}-admin-mackerel-agent'
+          Image: mackerel/mackerel-container-agent:latest
+          Memory: 128
+          Environment:
+            - Name: MACKEREL_CONTAINER_PLATFORM
+              Value: ecs_v3
+            - Name: MACKEREL_APIKEY
+              Value: 7KZotFiCz6H9A2qrytwjoRcTD4wZGxRzWcgrnZ2QnFuR
+          Essential: false
       TaskRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS
       Tags:
         - Key: Name

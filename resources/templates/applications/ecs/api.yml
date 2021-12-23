@@ -71,23 +71,15 @@ Resources:
             # LogConfiguration:
             #   LogDriver: awslogs
             #   Options:
-
-
-        # mackerelコンテナ定義
-          # - Name: !Sub '${Env}-content-mackerel-agent'
-          #   Image: mackerel/mackerel-container-agent:latest
-          #   Cpu: 256
-          #   Memory: 128
-          #   DisableNetworking: true
-          #   DependsOn:
-          #     - Condition: COMPLETE
-          #       ContainerName: !Sub '${Env}-content-mackerel'
-          #   Environment:
-          #     - Name: ACKEREL_CONTAINER_PLATFORM
-          #       Value: ecs_v3
-          #     - Name: MACKEREL_APIKEY
-          #       Value: # TODO API_KEY
-          #   Essential: false
+        - Name: !Sub '${Env}-api-mackerel-agent'
+          Image: mackerel/mackerel-container-agent:latest
+          Memory: 128
+          Environment:
+            - Name: MACKEREL_CONTAINER_PLATFORM
+              Value: ecs_v3
+            - Name: MACKEREL_APIKEY
+              Value: 7KZotFiCz6H9A2qrytwjoRcTD4wZGxRzWcgrnZ2QnFuR
+          Essential: false
       TaskRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS
       Tags:
         - Key: Name
