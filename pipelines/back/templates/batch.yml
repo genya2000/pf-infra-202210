@@ -37,7 +37,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-batch
-                BranchName: !If [IsProd, 'master', 'feature/chore_add_rundeck_execution']
+                BranchName: !If [IsProd, 'develop', 'feature/chore_add_rundeck_execution']
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:

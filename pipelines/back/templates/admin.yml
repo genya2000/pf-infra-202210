@@ -37,7 +37,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-admin
-                BranchName: !If [IsProd, 'test_prod', 'feature/fix_url_schema_generation']
+                BranchName: !If [IsProd, 'develop', 'feature/fix_url_schema_generation']
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
