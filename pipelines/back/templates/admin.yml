@@ -37,7 +37,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-admin
-                BranchName: !If [IsProd, 'test_prod', 'develop']
+                BranchName: !If [IsProd, 'test_prod', 'feature/fix_basic_authentication']
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
