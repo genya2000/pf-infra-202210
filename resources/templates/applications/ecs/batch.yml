@@ -128,4 +128,5 @@ Resources:
        Type: A
        AliasTarget:
          DNSName: !GetAtt BatchLoadBalancer.DNSName
+         HostedZoneId: !GetAtt BatchLoadBalancer.CanonicalHostedZoneID
 
