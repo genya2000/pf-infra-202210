@@ -6,33 +6,69 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ./network.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
 
   Security:
     Type: AWS::CloudFormation::Stack
     DependsOn: Network
     Properties:
       TemplateURL: ./securities/security_group.yml
-
-  IAM:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: ./securities/iam.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
 
   Cloudfront:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ./applications/cloudfront.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
 
   DB:
     Type: AWS::CloudFormation::Stack
     DependsOn: [Network, IAM, Security]
     Properties:
       TemplateURL: ./applications/db.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
 
-  ECS:
+  ECSCluster:
     Type: AWS::CloudFormation::Stack
-    DependsOn: [Network, IAM, Security]
+    DependsOn: [Network, Security]
     Properties:
-      TemplateURL: ./applications/ecs.yml
+      TemplateURL: ./applications/ecs/cluster.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
 
+  ECSApi:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: [ECSCluster]
+    Properties:
+      TemplateURL: ./applications/ecs/api.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+
+  ECSAdmin:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: [ECSCluster]
+    Properties:
+      TemplateURL: ./applications/ecs/admin.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+
+  ECSBatch:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: [ECSCluster]
+    Properties:
+      TemplateURL: ./applications/ecs/batch.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
 
