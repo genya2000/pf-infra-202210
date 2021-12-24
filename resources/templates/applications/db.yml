@@ -52,10 +52,10 @@ Resources:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-db'
 
-  DBInstanceReadReplica:
+  DBInstance2:
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Delete
-      # Condition: IsProd
+    Condition: IsProd
     Properties:
       DBClusterIdentifier: !Ref DBCluster
       Engine: aurora-mysql
