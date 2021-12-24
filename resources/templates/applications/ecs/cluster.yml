@@ -19,7 +19,7 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Sub '${Env}-cluster'
+      ClusterName: !Sub '${Env}-content'
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-cluster'
