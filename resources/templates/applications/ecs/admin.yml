@@ -71,10 +71,10 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: !Sub '${Env}/ecs/admin'
+              awslogs-group: !Sub '${Env}-ecs-admin'
               awslogs-region: !Ref AWS::Region  
               awslogs-create-group: true
-              awslogs-stream-prefix: ecs-admin
+              awslogs-stream-prefix: !Sub '${Env}-ecs-admin'
         - Name: !Sub '${Env}-admin-mackerel-agent'
           Image: public.ecr.aws/mackerel/mackerel-container-agent:latest
           Memory: 128
