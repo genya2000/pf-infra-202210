@@ -114,7 +114,10 @@ Resources:
       Bucket: !Sub '${Env}-switch-plus-cms'
       PolicyDocument:
         Statement:
-          - Action: s3:GetObject
+          - Action:
+              - s3:GetObject
+              - s3:PutObject
+              - s3:DeleteObject
             Effect: Allow
             Resource: !Sub 'arn:aws:s3:::${Env}-switch-plus-cms/*'
             Principal:
