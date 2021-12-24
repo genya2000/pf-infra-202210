@@ -120,51 +120,6 @@ Resources:
       Roles:
         - !Ref ECSServiceTaskRoleForExecAccessToECS
 
-  LambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: LambdaExecutionRole
-      AssumeRolePolicyDocument: {
-        "Version": "2012-10-17",
-        "Statement": [
-          {
-            "Principal": {
-              "Service": "lambda.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole",
-            "Effect": "Allow" 
-          }
-        ]
-      }
-      Description: Lambda Execution Role
-
-  LambdaExecutionPolicy:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyName: LambdaBasicAuthenticationExecutionPolicy
-      PolicyDocument: {
-        "Version": "2012-10-17",
-        "Statement": [
-          {
-            "Effect": "Allow",
-            "Action": "logs:CreateLogGroup",
-            "Resource": "arn:aws:logs:ap-northeast-1:176282227532:*"
-          },
-          {
-            "Effect": "Allow",
-            "Action": [
-              "logs:CreateLogStream",
-              "logs:PutLogEvents"
-            ],
-            "Resource": [
-              "arn:aws:logs:ap-northeast-1:176282227532:log-group:/aws/lambda/Basic-Authentication:*"
-            ]
-          }
-        ]
-      }
-      Roles:
-        - !Ref LambdaExecutionRole
-
 Outputs:
   ECSTaskExecutionRole:
     Value: !GetAtt ECSTaskExecutionRole.Arn
@@ -174,8 +129,4 @@ Outputs:
     Value: !GetAtt ECSServiceTaskRoleForExecAccessToECS.Arn
     Export:
       Name: ECSServiceTaskRoleForExecAccessToECS
-  LambdaExecutionRole:
-    Value: !GetAtt LambdaExecutionRole.Arn
-    Export:
-      Name: LambdaExecutionRole
 
