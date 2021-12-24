@@ -70,6 +70,11 @@ Resources:
               Value: !Sub 'arn:aws:s3:::switch-plus/env/${Env}/cw-imedia-admin/.env'
           LogConfiguration:
             LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub '${Env}/ecs/admin'
+              awslogs-region: !Ref AWS::Region  
+              awslogs-create-group: true
+              awslogs-stream-prefix: ecs-admin
         - Name: !Sub '${Env}-admin-mackerel-agent'
           Image: public.ecr.aws/mackerel/mackerel-container-agent:latest
           Memory: 128
