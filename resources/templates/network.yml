@@ -226,6 +226,15 @@ Resources:
       NatGatewayId: !Ref NatGateway
       RouteTableId: !Ref PrivateRouteTable
 
+  ##### NATゲートウェイルートを作成 #####
+  VPCS3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      RouteTableIds:
+        - !Ref PrivateRouteTable
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+      VpcId: !Ref Vpc
+
 Outputs:
   VpcId:
     Value: !Ref Vpc
