@@ -86,7 +86,7 @@ Resources:
   DBParameterGroup:
     Type: AWS::RDS::DBParameterGroup
     Properties:
-      Description: !Sub '${Env} Imedia DB Parameter Group'
+      Description: !Sub '${Env} DB Parameter Group'
       Family: aurora-mysql5.7
       Parameters:
         max_allowed_packet: 100000
@@ -97,7 +97,7 @@ Resources:
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
-      DBSubnetGroupDescription: !Sub '${Env} Imedia DB Subnet Group'
+      DBSubnetGroupDescription: !Sub '${Env} DB Subnet Group'
       SubnetIds:
         - Fn::ImportValue: !Sub '${Env}-DBPrivateSubnetA'
         - Fn::ImportValue: !Sub '${Env}-DBPrivateSubnetB'
