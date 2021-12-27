@@ -38,6 +38,22 @@ Resources:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-cluster'
 
+  DBClusterParameterGroup:
+    Type: AWS::RDS::DBClusterParameterGroup
+    Properties:
+      Description: !Sub '${Env} aurora parameter group'
+      Family: aurora-mysql5.7
+      Parameters:
+        time_zone: Asia/Tokyo
+        character_set_client: utf8mb4
+        character_set_database: utf8mb4
+        character_set_results: utf8mb4
+        character_set_connection: utf8mb4
+        character_set_server: utf8mb4
+      Tags:
+        - Key: Name
+          Value: !Sub '${Env}-cluster-parameter-group'
+
   DBInstance:
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Delete
