@@ -68,6 +68,13 @@ Resources:
           EnvironmentFiles:
             - Type: s3
               Value: !Sub 'arn:aws:s3:::switch-plus/env/${Env}/cw-imedia-api/.env'
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub '${Env}-ecs-api'
+              awslogs-region: !Ref AWS::Region
+              awslogs-create-group: true
+              awslogs-stream-prefix: !Sub '${Env}-ecs-api'
             #         - Name: !Sub '${Env}-api-mackerel-agent'
             #           Image: public.ecr.aws/mackerel/mackerel-container-agent:latest
             #           Memory: 128
