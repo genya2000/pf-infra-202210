@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: SwitchPlus Action History Template
+
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switchplus
+    Description: Enter service name
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+Resources:
+  ActionHistoryApiGateway:
+   Type: AWS::CloudFormation::Stack
+   Properties:
+     TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/action-history/services/apigateway.yml
+     Parameters:
+       Env: !Ref Env
+       ServiceName: !Ref ServiceName
+

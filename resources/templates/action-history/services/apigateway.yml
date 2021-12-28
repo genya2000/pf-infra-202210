@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: API Gateway Template for Action History
+
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switch_plus
+    Description: Enter service name
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+Conditions:
+  IsStg: !Equals [!Ref Env, 'stg']
+
+Resources:
+  ActionHistoryWebBeaconApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties: 
+      Name: !Sub '${Env}-action-history-web-beacon'
+      ProtocolType: HTTP
+      Description: Web Beacon for Action History
+  ActionHistoryWebBeaconApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref ActionHistoryWebBeaconApiGateway
+      StageName: $default
+      Description: Default Stage
+      AutoDeploy: true
