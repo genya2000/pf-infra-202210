@@ -17,10 +17,20 @@ Parameters:
 
 Resources:
   ActionHistoryApiGateway:
-   Type: AWS::CloudFormation::Stack
-   Properties:
-     TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/action-history/services/apigateway.yml
-     Parameters:
-       Env: !Ref Env
-       ServiceName: !Ref ServiceName
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/action-history/services/apigateway.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+
+  ActionHistoryCloudfront:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/action-history/services/cloudfront.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+        ActionHistoryWebBeaconApiUrl:
+          !GetAtt ActionHistoryApiGateway.Outputs.WebBeaconApiUrl
 

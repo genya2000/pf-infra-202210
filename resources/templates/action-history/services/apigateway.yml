@@ -32,3 +32,10 @@ Resources:
       StageName: $default
       Description: Default Stage
       AutoDeploy: true
+
+Outputs:
+  WebBeaconApiUrl:
+    Value: !Sub
+      - "${ApiId}.execute-api.${AWS::Region}.amazonaws.com"
+      - ApiId: !Ref ActionHistoryWebBeaconApiGateway
+    Description: ActionHistory WebBeacon API Gateway url.
