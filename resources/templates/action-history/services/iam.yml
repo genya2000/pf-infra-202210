@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: API Gateway Template for Action History
+
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switch_plus
+    Description: Enter service name
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+Conditions:
+  IsStg: !Equals [!Ref Env, 'stg']
+
+Resources:
+  ActionHistory001ApiGateway2SqsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${Env}-${ServiceName}-action-history-001-agw2sqs-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${Env}-${ServiceName}-action-history-001-awg2sqs-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Resource: "*"
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:CreateExportTask
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+
+Outputs:
+  ActionHistory001ApiGateway2SqsRole:
+    Value: !GetAtt ActionHistory001ApiGateway2SqsRole.Arn
+    Export:
+      Name: ActionHistory001ApiGateway2SqsRole
