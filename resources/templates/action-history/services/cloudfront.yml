@@ -80,7 +80,7 @@ Resources:
             - HEAD
           ForwardedValues:
             QueryString: true
-        PriceClass: PriceClass_100
+        PriceClass: PriceClass_200
         ViewerCertificate:
           SslSupportMethod: sni-only
           AcmCertificateArn: !If [
