@@ -67,4 +67,3 @@ Resources:
         ServiceName: !Ref ServiceName
         ActionHistoryWebBeaconApiUrl:
           !GetAtt ActionHistoryApiGateway.Outputs.WebBeaconApiUrl
-
