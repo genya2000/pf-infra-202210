@@ -43,12 +43,40 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                   - logs:CreateExportTask
-                  - sqs:ReceiveMessage
-                  - sqs:DeleteMessage
-                  - sqs:GetQueueAttributes
+                  - sqs:*
+  ActionHistory002Sqs2DynamoDBRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${Env}-${ServiceName}-action-history-002-sqs2dynamodb-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${Env}-${ServiceName}-action-history-002-sqs2dynamodb-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Resource: "*"
+                Action:
+                  - dynamodb:*
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:CreateExportTask
+                  - sqs:*
 
 Outputs:
   ActionHistory001ApiGateway2SqsRole:
     Value: !GetAtt ActionHistory001ApiGateway2SqsRole.Arn
     Export:
       Name: ActionHistory001ApiGateway2SqsRole
+  ActionHistory002Sqs2DynamoDBRole:
+    Value: !GetAtt ActionHistory002Sqs2DynamoDBRole.Arn
+    Export:
+      Name: ActionHistory002Sqs2DynamoDBRole
