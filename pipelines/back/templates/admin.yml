@@ -37,7 +37,7 @@ Resources:
                 Version: 1
               Configuration:
                 RepositoryName: cw-imedia-admin
-                BranchName: !If [IsProd, 'develop', 'feature/add_log_to_cloud_watch']
+                BranchName: develop
                 PollForSourceChanges: true
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
               OutputArtifacts:
