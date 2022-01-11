@@ -13,5 +13,9 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': json.dumps(response)
+        "headers": {
+            'Content-Type': 'image/gif'
+        },
+        "body": "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+        "isBase64Encoded": True
     }
