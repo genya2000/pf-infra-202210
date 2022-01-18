@@ -80,6 +80,10 @@ Resources:
             - HEAD
           ForwardedValues:
             QueryString: true
+            Cookies:
+              Forward: whitelist
+              WhitelistedNames:
+                - SwitchPlusVID
         PriceClass: PriceClass_200
         ViewerCertificate:
           SslSupportMethod: sni-only
