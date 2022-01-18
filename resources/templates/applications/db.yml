@@ -112,6 +112,7 @@ Resources:
       HostedZoneId: !If [IsProd, 'Z06069631TP3ZZ0V33UKJ', 'Z0172048P9L6ZJKXTXK']
       Name: !If [IsProd, 'db.switch-plus.jp', 'db.stg.switch-plus.jp']
       Type: CNAME
+      TTL: 900
       ResourceRecords:
         - !GetAtt DBCluster.Endpoint.Address
  
