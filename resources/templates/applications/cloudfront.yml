@@ -27,7 +27,7 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
-        Comment: content distribution
+        Comment: !Sub '[${Env}] Service Site Distribution'
         Enabled: true
         IPV6Enabled: false
         Origins:
