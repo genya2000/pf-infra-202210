@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: SwitchPlus Action History Template
+
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switchplus
+    Description: Enter service name
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+Resources:
+  ActionHistoryIAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/action-history/services/iam.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+
+  ActionHistoryQueue:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/action-history/services/sqs.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+
+  ActionHistoryLambda:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/action-history/services/lambda.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+        ActionHistory001ApiGateway2SqsRole:
+          !GetAtt ActionHistoryIAM.Outputs.ActionHistory001ApiGateway2SqsRole
+        ActionHistory002Sqs2DynamoDBRole:
+          !GetAtt ActionHistoryIAM.Outputs.ActionHistory002Sqs2DynamoDBRole
+        ActionHistorySaveDynamodbQueue:
+          !GetAtt ActionHistoryQueue.Outputs.ActionHistorySaveDynamodbQueue
+        ActionHistorySaveDynamodbQueueName:
+          !GetAtt ActionHistoryQueue.Outputs.ActionHistorySaveDynamodbQueueName
+
+  ActionHistoryApiGateway:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/action-history/services/apigateway.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+        ActionHistory001ApiGateway2SqsLambda:
+          !GetAtt ActionHistoryLambda.Outputs.ActionHistory001ApiGateway2SqsLambda
+
+  ActionHistoryCloudfront:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/resources/templates/action-history/services/cloudfront.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+        ActionHistoryWebBeaconApiUrl:
+          !GetAtt ActionHistoryApiGateway.Outputs.WebBeaconApiUrl
