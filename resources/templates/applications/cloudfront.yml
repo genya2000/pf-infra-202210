@@ -41,6 +41,7 @@ Resources:
             ErrorCode: 403
             ResponseCode: 200
             ResponsePagePath: /
+        PriceClass: PriceClass_200
         DefaultCacheBehavior:
           ForwardedValues:
             QueryString: true
