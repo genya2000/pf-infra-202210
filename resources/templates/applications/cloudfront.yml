@@ -27,6 +27,8 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
+        Aliases:
+          - !If [IsStg, 'stg.switch-plus.jp', 'switch-plus.jp']
         Comment: !Sub '[${Env}] Service Site Distribution'
         Enabled: true
         IPV6Enabled: false
