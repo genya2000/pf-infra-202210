@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: SwitchPlus Redirect and set cookie Template
+
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switchplus
+    Description: Enter service name
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+Resources:
+  RedirectSetCookieLambda:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/redirect-set-cookie/templates/services/lambda.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+
+  RedirectSetCookieApiGateway:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: RedirectSetCookieLambda
+    Properties:
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/redirect-set-cookie/templates/services/apigateway.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+        RedirectSetCookieLambda:
+          !GetAtt RedirectSetCookieLambda.Outputs.RedirectSetCookieLambda
+
+  RedirectSetCookieCloudfront:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: RedirectSetCookieApiGateway
+    Properties:
+      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/redirect-set-cookie/templates/services/cloudfront.yml
+      Parameters:
+        Env: !Ref Env
+        ServiceName: !Ref ServiceName
+        RedirectSetCookieApiUrl:
+          !GetAtt RedirectSetCookieApiGateway.Outputs.RedirectSetCookieApiUrl

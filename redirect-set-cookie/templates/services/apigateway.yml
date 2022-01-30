@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: API Gateway Template for Action History
+
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switch_plus
+    Description: Enter service name
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+  RedirectSetCookieLambda:
+    Type: String
+    Description: The shared value will be passed to this parameter by parent stack.
+
+Conditions:
+  IsStg: !Equals [!Ref Env, 'stg']
+
+Resources:
+  RedirectSetCookieApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties: 
+      Name: !Sub '${Env}-redirect-set-cookie'
+      ProtocolType: HTTP
+      Description: !Sub '[${Env}] Redirect set cookie'
+  RedirectSetCookieApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref RedirectSetCookieApiGateway
+      StageName: $default
+      Description: Default Stage
+      AutoDeploy: true
+  RedirectSetCookieApiIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref RedirectSetCookieApiGateway
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Ref RedirectSetCookieLambda
+      PayloadFormatVersion: 2.0
+  RedirectSetCookieApiRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref RedirectSetCookieApiGateway
+      RouteKey: 'GET /to'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref RedirectSetCookieApiIntegration
+
+Outputs:
+  RedirectSetCookieApiUrl:
+    Value: !Sub
+      - "${ApiId}.execute-api.${AWS::Region}.amazonaws.com"
+      - ApiId: !Ref RedirectSetCookieApiGateway
+    Description: Redirect set cookie API Gateway url.
