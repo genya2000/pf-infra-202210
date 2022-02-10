@@ -43,6 +43,7 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                   - logs:CreateExportTask
+                  - events:PutEvents
   RedirectSetCookieLambda:
     Type: AWS::Lambda::Function
     Properties:
