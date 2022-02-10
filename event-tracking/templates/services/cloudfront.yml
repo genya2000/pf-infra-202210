@@ -27,13 +27,13 @@ Resources:
     Properties:
       DistributionConfig:
         Aliases:
-          - !If [IsStg, 'c.stg.switch-plus.jp', 'c.stg.switch-plus.jp']
+          - !If [IsStg, 'c.stg.switch-plus.jp', 'c.switch-plus.jp']
         Origins:
           - Id: EventTrackingSESEventOrigin
             DomainName: !If [IsStg, 'r.ap-northeast-1.awstrack.me', 'r.ap-northeast-1.awstrack.me']
             CustomOriginConfig:
               OriginProtocolPolicy: match-viewer
-        Comment: !Sub '[${Env}] Event Tracking Distribution'
+        Comment: !Sub '[${Env}] SES Click Event Tracking Distribution'
         Enabled: true
         IPV6Enabled: false
         DefaultRootObject: index.html
