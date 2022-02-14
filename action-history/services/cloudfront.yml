@@ -28,7 +28,7 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     Properties:
-      BucketName: !Sub ${Env}-${ServiceName}-action-history-assets
+      BucketName: !Sub ${Env}-${ServiceName}-assets
   # S3 bucket policy to allow access from CloudFront OAI
   ActionHistoryAssetsBucketPolicy:
     Type: AWS::S3::BucketPolicy
