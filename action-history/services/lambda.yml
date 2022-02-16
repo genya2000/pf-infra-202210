@@ -36,7 +36,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: switch-plus-infra
-        S3Key: resources/templates/action-history/services/lambda/001_agw2sqs/lambda_function-220106.zip
+        S3Key: action-history/services/lambda/001_agw2sqs/lambda_function-220106.zip
       Environment:
         Variables:
           queueName: !Ref ActionHistorySaveDynamodbQueueName
@@ -62,7 +62,7 @@ Resources:
     Properties:
       Code:
         S3Bucket: switch-plus-infra
-        S3Key: resources/templates/action-history/services/lambda/002_sqs2dynamodb/lambda_function.zip
+        S3Key: action-history/services/lambda/002_sqs2dynamodb/lambda_function.zip
       Environment:
         Variables:
           queueName: !Ref ActionHistorySaveDynamodbQueueName
