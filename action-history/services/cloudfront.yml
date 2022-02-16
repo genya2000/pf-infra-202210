@@ -49,7 +49,7 @@ Resources:
     Properties:
       DistributionConfig:
         Aliases:
-          - 'cdn.stg.switch-plus.jp'
+          - !If [IsStg, 'cdn.stg.switch-plus.jp', 'cdn.switch-plus.jp']
         Origins:
           - Id: S3Origin
             DomainName: !GetAtt ActionHistoryAssetsBucket.DomainName
