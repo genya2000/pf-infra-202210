@@ -37,17 +37,19 @@ Resources:
         Aliases:
           - !If [IsStg, 'cdn.stg.switch-plus.jp', 'cdn.switch-plus.jp']
         Origins:
-          - Id: CdnS3Origin
+          - Id: !If [IsStg, 'stg-switchplus-assets.s3.ap-northeast-1.amazonaws.com', 'prod-switchplus-assets.s3.ap-northeast-1.amazonaws.com']
             DomainName: !If [IsStg, 'stg-switchplus-assets.s3.ap-northeast-1.amazonaws.com', 'prod-switchplus-assets.s3.ap-northeast-1.amazonaws.com']
             S3OriginConfig:
               OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CdnCloudFrontOriginAccessIdentity}
-        Comment: !Sub '[{Env}] cdn distribution'
+        Comment: !Sub '[${Env}] cdn distribution'
         Enabled: true
         IPV6Enabled: false
+        HttpVersion: http2
         DefaultRootObject: index.html
         DefaultCacheBehavior:
-          TargetOriginId: CdnS3Origin
+          TargetOriginId: !If [IsStg, 'stg-switchplus-assets.s3.ap-northeast-1.amazonaws.com', 'prod-switchplus-assets.s3.ap-northeast-1.amazonaws.com']
           ViewerProtocolPolicy: https-only
+          Compress: true
           AllowedMethods:
             - GET
             - HEAD
@@ -68,7 +70,7 @@ Resources:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
     Properties:
       CloudFrontOriginAccessIdentityConfig:
-        Comment: !Ref AWS::StackName
+        Comment: !If [IsStg, 'stg-switchplus-cdn-oai', 'prod-switchplus-cdn-oai']
   DomainAssociateToCdnDistribution:
     Type: AWS::Route53::RecordSet
     Properties:
