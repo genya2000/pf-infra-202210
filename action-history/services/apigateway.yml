@@ -28,7 +28,7 @@ Resources:
     Properties: 
       Name: !Sub '${Env}-action-history-web-beacon'
       ProtocolType: HTTP
-      Description: Web Beacon for Action History
+      Description: !Sub '[${Env}] Web Beacon for Action History'
   ActionHistoryWebBeaconApiStage:
     Type: AWS::ApiGatewayV2::Stage
     Properties:
