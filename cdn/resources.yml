@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: SwitchPlus Cdn Template
+
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switchplus
+    Description: Enter service name
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+Conditions:
+  IsStg: !Equals [!Ref Env, 'stg']
+
+Resources:
+  CdnAssetsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !If [IsStg, 'stg-switchplus-assets', 'prod-switchplus-assets']
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: !If [IsStg, 'arn:aws:s3:::stg-switchplus-assets/*', 'arn:aws:s3:::prod-switchplus-assets/*']
+            Principal:
+              AWS: !Sub arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CdnCloudFrontOriginAccessIdentity}
+  CdnDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !If [IsStg, 'cdn.stg.switch-plus.jp', 'cdn.switch-plus.jp']
+        Origins:
+          - Id: !If [IsStg, 'stg-switchplus-assets.s3.ap-northeast-1.amazonaws.com', 'prod-switchplus-assets.s3.ap-northeast-1.amazonaws.com']
+            DomainName: !If [IsStg, 'stg-switchplus-assets.s3.ap-northeast-1.amazonaws.com', 'prod-switchplus-assets.s3.ap-northeast-1.amazonaws.com']
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CdnCloudFrontOriginAccessIdentity}
+        Comment: !Sub '[${Env}] cdn distribution'
+        Enabled: true
+        IPV6Enabled: false
+        HttpVersion: http2
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: !If [IsStg, 'stg-switchplus-assets.s3.ap-northeast-1.amazonaws.com', 'prod-switchplus-assets.s3.ap-northeast-1.amazonaws.com']
+          ViewerProtocolPolicy: https-only
+          Compress: true
+          AllowedMethods:
+            - GET
+            - HEAD
+          ForwardedValues:
+            QueryString: false
+        PriceClass: PriceClass_200
+        ViewerCertificate:
+          SslSupportMethod: sni-only
+          AcmCertificateArn: !If [
+            IsStg,
+            !Sub 'arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/84e89707-1d47-4b58-a1e2-4bc13a214951',
+            !Sub 'arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/2092b2b3-823f-4d48-9713-04ef3b3e0944'
+          ]
+      Tags:
+        - Key: Name
+          Value: !Sub '${Env}-${ServiceName}-cdn-distribution'
+  CdnCloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !If [IsStg, 'stg-switchplus-cdn-oai', 'prod-switchplus-cdn-oai']
+  DomainAssociateToCdnDistribution:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: !If [IsStg, 'cdn.stg.switch-plus.jp', 'cdn.switch-plus.jp']
+      HostedZoneId: !If [IsStg, 'Z0733895VBADANRGGAJM', 'Z06282532GKTX3AC0EE5T']
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt CdnDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2 # 固定値 @ref https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget-1.html#cfn-route53-aliastarget-hostedzoneid
