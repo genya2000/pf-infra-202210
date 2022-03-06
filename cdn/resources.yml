@@ -19,22 +19,15 @@ Conditions:
   IsStg: !Equals [!Ref Env, 'stg']
 
 Resources:
-  # S3 bucket contains static contents
-  CdnAssetsBucket:
-    Type: AWS::S3::Bucket
-    DeletionPolicy: Retain
-    Condition: IsStg
-    Properties:
-      BucketName: !Sub ${Env}-${ServiceName}-assets
   CdnAssetsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref CdnAssetsBucket
+      Bucket: !If [IsStg, 'stg-switchplus-assets', 'prod-switchplus-assets']
       PolicyDocument:
         Statement:
           - Action: s3:GetObject
             Effect: Allow
-            Resource: !Sub arn:aws:s3:::${CdnAssetsBucket}/*
+            Resource: !If [IsStg, 'arn:aws:s3:::stg-switchplus-assets/*', 'arn:aws:s3:::prod-switchplus-assets/*']
             Principal:
               AWS: !Sub arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CdnCloudFrontOriginAccessIdentity}
   CdnDistribution:
@@ -45,7 +38,7 @@ Resources:
           - !If [IsStg, 'cdn.stg.switch-plus.jp', 'cdn.switch-plus.jp']
         Origins:
           - Id: CdnS3Origin
-            DomainName: !GetAtt CdnAssetsBucket.DomainName
+            DomainName: !If [IsStg, 'stg-switchplus-assets.s3.ap-northeast-1.amazonaws.com', 'prod-switchplus-assets.s3.ap-northeast-1.amazonaws.com']
             S3OriginConfig:
               OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CdnCloudFrontOriginAccessIdentity}
         Comment: !Sub '[{Env}] cdn distribution'
