@@ -22,25 +22,6 @@ Conditions:
   IsStg: !Equals [!Ref Env, 'stg']
 
 Resources:
-
-  # S3 bucket contains static contents
-  ActionHistoryAssetsBucket:
-    Type: AWS::S3::Bucket
-    DeletionPolicy: Retain
-    Properties:
-      BucketName: !Sub ${Env}-${ServiceName}-assets
-  # S3 bucket policy to allow access from CloudFront OAI
-  ActionHistoryAssetsBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref ActionHistoryAssetsBucket
-      PolicyDocument:
-        Statement:
-          - Action: s3:GetObject
-            Effect: Allow
-            Resource: !Sub arn:aws:s3:::${ActionHistoryAssetsBucket}/*
-            Principal:
-              AWS: !Sub arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${ActionHistoryCloudFrontOriginAccessIdentity}
   ##### CloudFront Distribution の作成 #####
   # ※カスタムオリジンの設定はCloudFrontでは対応していない
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html#cfn-cloudfront-distribution-distributionconfig
@@ -49,12 +30,8 @@ Resources:
     Properties:
       DistributionConfig:
         Aliases:
-          - !If [IsStg, 'cdn.stg.switch-plus.jp', 'cdn.switch-plus.jp']
+          - !If [IsStg, 'a.stg.switch-plus.jp', 'a.switch-plus.jp']
         Origins:
-          - Id: S3Origin
-            DomainName: !GetAtt ActionHistoryAssetsBucket.DomainName
-            S3OriginConfig:
-              OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${ActionHistoryCloudFrontOriginAccessIdentity}
           - Id: ActionHistoryApiGatewayOrigin
             DomainName: !Ref ActionHistoryWebBeaconApiUrl
             CustomOriginConfig:
@@ -63,15 +40,6 @@ Resources:
         Enabled: true
         IPV6Enabled: false
         DefaultRootObject: index.html
-        CacheBehaviors:
-          - PathPattern: js/*
-            AllowedMethods:
-              - GET
-              - HEAD
-            ViewerProtocolPolicy: https-only
-            TargetOriginId: S3Origin
-            ForwardedValues:
-              QueryString: false
         DefaultCacheBehavior:
           TargetOriginId: ActionHistoryApiGatewayOrigin
           ViewerProtocolPolicy: https-only
@@ -83,7 +51,9 @@ Resources:
             Cookies:
               Forward: whitelist
               WhitelistedNames:
-                - SwitchPlusVID
+                - splid
+                - spcid
+                - spft
         PriceClass: PriceClass_200
         ViewerCertificate:
           SslSupportMethod: sni-only
@@ -95,16 +65,11 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${Env}-${ServiceName}-action-history-distribution'
-  ActionHistoryCloudFrontOriginAccessIdentity:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: !Ref AWS::StackName
   DomainAssociateToActionHistoryDistribution:
     Type: AWS::Route53::RecordSet
     Properties:
-      Name: !If [IsStg, 'cdn.stg.switch-plus.jp', 'cdn.switch-plus.jp']
-      HostedZoneId: !If [IsStg, 'Z0733895VBADANRGGAJM', 'Z037803221ZH1F5RB8GDA']
+      Name: !If [IsStg, 'a.stg.switch-plus.jp', 'a.switch-plus.jp']
+      HostedZoneId: !If [IsStg, 'Z09183552LBI6Y2LBA751', 'Z0005521QYN2C1X4165B']
       Type: A
       AliasTarget:
         DNSName: !GetAtt ActionHistoryDistribution.DomainName
