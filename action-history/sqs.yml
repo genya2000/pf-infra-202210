@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: API Gateway Template for Action History
+
+Parameters:
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+Conditions:
+  IsStg: !Equals [!Ref Env, 'stg']
+
+Resources:
+  ActionHistorySaveDynamodbQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${Env}-action-history-save-dynamodb-queue

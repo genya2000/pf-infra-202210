@@ -15,55 +15,72 @@ Parameters:
       - prod
     Description: Enter stg or prod
 
+Conditions:
+  IsStg: !Equals [!Ref Env, 'stg']
+
 Resources:
-  ActionHistoryIAM:
-    Type: AWS::CloudFormation::Stack
+  ActionHistoryWebBeaconApiDomainName:
+    Type: AWS::ApiGatewayV2::DomainName
     Properties:
-      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/action-history/services/iam.yml
-      Parameters:
-        Env: !Ref Env
-        ServiceName: !Ref ServiceName
-
-  ActionHistoryQueue:
-    Type: AWS::CloudFormation::Stack
+      DomainName: !If [IsStg, 'a.stg.switch-plus.jp', 'a.switch-plus.jp']
+      DomainNameConfigurations:
+        - EndpointType: REGIONAL
+          CertificateArn: !If [
+            IsStg,
+            !Sub 'arn:aws:acm:ap-northeast-1:${AWS::AccountId}:certificate/aa91ee9b-15fb-49b5-9155-52f3c3900e86',
+            !Sub 'arn:aws:acm:ap-northeast-1:${AWS::AccountId}:certificate/e0a91fd8-94a0-4c4c-b6d7-a8d2713fee27'
+          ]
+          CertificateName: !If [IsStg, 'stg.switch-plus.jp', 'switch-plus.jp']
+  ActionHistoryWebBeaconApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties: 
+      Name: !Sub '${Env}-action-history-web-beacon'
+      ProtocolType: HTTP
+      Description: !Sub '[${Env}] Web Beacon for Action History'
+      DisableExecuteApiEndpoint: true
+  ActionHistoryWebBeaconApiStage:
+    Type: AWS::ApiGatewayV2::Stage
     Properties:
-      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/action-history/services/sqs.yml
-      Parameters:
-        Env: !Ref Env
-        ServiceName: !Ref ServiceName
-
-  ActionHistoryLambda:
-    Type: AWS::CloudFormation::Stack
+      ApiId: !Ref ActionHistoryWebBeaconApiGateway
+      StageName: $default
+      Description: Default Stage
+      AutoDeploy: true
+  ActionHistoryWebBeaconApiIntegration:
+    Type: AWS::ApiGatewayV2::Integration
     Properties:
-      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/action-history/services/lambda.yml
-      Parameters:
-        Env: !Ref Env
-        ServiceName: !Ref ServiceName
-        ActionHistory001ApiGateway2SqsRole:
-          !GetAtt ActionHistoryIAM.Outputs.ActionHistory001ApiGateway2SqsRole
-        ActionHistory002Sqs2DynamoDBRole:
-          !GetAtt ActionHistoryIAM.Outputs.ActionHistory002Sqs2DynamoDBRole
-        ActionHistorySaveDynamodbQueue:
-          !GetAtt ActionHistoryQueue.Outputs.ActionHistorySaveDynamodbQueue
-        ActionHistorySaveDynamodbQueueName:
-          !GetAtt ActionHistoryQueue.Outputs.ActionHistorySaveDynamodbQueueName
-
-  ActionHistoryApiGateway:
-    Type: AWS::CloudFormation::Stack
+      ApiId: !Ref ActionHistoryWebBeaconApiGateway
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub 'arn:aws:lambda:ap-northeast-1:176282227532:function:${Env}-action-history-001-agw2sqs'
+      PayloadFormatVersion: 2.0
+  ActionHistoryWebBeaconApiRoute:
+    Type: AWS::ApiGatewayV2::Route
     Properties:
-      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/action-history/services/apigateway.yml
-      Parameters:
-        Env: !Ref Env
-        ServiceName: !Ref ServiceName
-        ActionHistory001ApiGateway2SqsLambda:
-          !GetAtt ActionHistoryLambda.Outputs.ActionHistory001ApiGateway2SqsLambda
-
-  ActionHistoryCloudfront:
-    Type: AWS::CloudFormation::Stack
+      ApiId: !Ref ActionHistoryWebBeaconApiGateway
+      RouteKey: 'GET /b.gif'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref ActionHistoryWebBeaconApiIntegration
+  ActionHistoryApiMapping:
+    Type: AWS::ApiGatewayV2::ApiMapping
     Properties:
-      TemplateURL: https://switch-plus-infra.s3.ap-northeast-1.amazonaws.com/action-history/services/cloudfront.yml
-      Parameters:
-        Env: !Ref Env
-        ServiceName: !Ref ServiceName
-        ActionHistoryWebBeaconApiUrl:
-          !GetAtt ActionHistoryApiGateway.Outputs.WebBeaconApiUrl
+      DomainName: !If [IsStg, 'a.stg.switch-plus.jp', 'a.switch-plus.jp']
+      ApiId: !Ref ActionHistoryWebBeaconApiGateway
+      Stage: !Ref ActionHistoryWebBeaconApiStage
+      ApiMappingKey: ''
+  ActionHistory002Sqs2DynamoDBLambdaEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      Enabled: true
+      EventSourceArn: !Sub 'arn:aws:sqs:ap-northeast-1:176282227532:${Env}-action-history-save-dynamodb-queue'
+      FunctionName: !Sub 'arn:aws:lambda:ap-northeast-1:176282227532:function:${Env}-action-history-002-sqs2dynamodb'
+  DomainAssociateToActionHistoryDistribution:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: !If [IsStg, 'a.stg.switch-plus.jp', 'a.switch-plus.jp']
+      HostedZoneId: !If [IsStg, 'Z09183552LBI6Y2LBA751', 'Z0005521QYN2C1X4165B']
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt ActionHistoryWebBeaconApiDomainName.RegionalDomainName
+        HostedZoneId: !GetAtt ActionHistoryWebBeaconApiDomainName.RegionalHostedZoneId
