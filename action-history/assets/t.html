@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <meta name="robots" content="noindex,nofollow">
+        <script>
+         /* var url = new URL(window.location.href);
+          * var params = url.searchParams;
+          * var targetOrigin = params.get('t'); */
+         function receiveMessage(event) {
+             var origin = event.origin;
+             // var key = 'SPDATA';
+             var localStoragekeys = ['spvid', 'splid'];
+             var sessionStoragekeys = ['spft'];
+             var message = event.data;
+
+             if (message === 'get') {
+                 var data = {};
+                 try {
+                     localStoragekeys.forEach(function(key) {
+                         if ( window.localStorage.getItem(key) !== null ) {
+                             data[key] = window.localStorage.getItem(key);
+                         }
+                     });
+                     sessionStoragekeys.forEach(function(key) {
+                         if ( window.sessionStorage.getItem(key) !== null ) {
+                             data[key] = window.sessionStorage.getItem(key);
+                         }
+                     });
+                 } catch(error) {
+                     data['error'] = error;
+                     // nothing
+                 }
+                 event.source.postMessage(data, event.origin);
+                 return;
+             }
+             
+             if ( !message.spcdomain ) {
+                 return;
+             }
+             if ( event.origin != message.spcdomain ) {
+                 return;
+             }
+             delete message.spcdomain;
+
+             try {
+                 if ( window.localStorage.getItem('spvid') === null && message['spvid']) {
+                     window.localStorage.setItem('spvid', message['spvid']);
+                 }
+                 if ( window.localStorage.getItem('splid') === null && message['splid']) {
+                     window.localStorage.setItem('splid', message['splid']);
+                 }
+                 if ( window.sessionStorage.getItem('spft') === null && message['spft']) {
+                     window.sessionStorage.setItem('spft', message['spft']);
+                 }
+             } catch {
+                 // nothing
+             }
+             /* window.localStorage.setItem(key, JSON.stringify(message));
+              * window.sessionStorage.setItem(key, JSON.stringify(message)); */
+             return;
+         }
+         
+         // Add a listener to listen for postMessage messages
+         window.addEventListener('message', receiveMessage);
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

@@ -85,77 +85,59 @@ Resources:
           import time
           import boto3
           import uuid
-          
+          from urllib.parse import urlparse
+
           name = os.environ['queueName']
           sqs = boto3.resource('sqs')
-          domain = '.stg.switch-plus.jp'
           expires = datetime.datetime.utcnow() + datetime.timedelta(days=365) # expires in 365 days
-          cookieIdKey = 'spcid'
+          cookieIdKey = 'spvid'
           leadIdKey = 'splid'
           firstTimeKey = 'spft'
-          autoGenCookieId = str(uuid.uuid4())
+          autoGenVisitorId = str(uuid.uuid4())
           timestampNow = int(time.time())
-          
+
           def lambda_handler(event, context):
-              print(event)
-              
-              cookieId = autoGenCookieId
-              firstTime = timestampNow
-              leadId = None
-              
-              if 'cookies' in event:
-                  cookies = event['cookies']
-                  for cookieValue in cookies:
-                      [key, value] = cookieValue.split('=')
-                      
-                      if key == cookieIdKey:
-                          cookieId = value
-          
-                      if key == firstTimeKey:
-                          firstTime = value
-          
-                      if key == leadIdKey:
-                          leadId = value
-              
-              if 'headers' in event:
-                  headers = event['headers']
-          
-              if 'queryStringParameters' in event:
-                  queryStringParameters = event['queryStringParameters']
-          
-              data = {
-                  'CookieID': cookieId,
-                  'Timestamp': timestampNow,
-                  'leadId': leadId,
-                  'url': queryStringParameters.get('p'),
-                  'title': queryStringParameters.get('t'),
-                  'refererUrl': queryStringParameters.get('r'),
-                  'firstTime': firstTime,
-                  'query': queryStringParameters.get('q'),
-                  'UserAgent': headers.get('user-agent'),
-                  'isKeypage': queryStringParameters.get('kp'),
-              }
-              
-              queue = sqs.get_queue_by_name(QueueName=name)
-          
-              response = queue.send_message(MessageBody=json.dumps(data))
-              
-              cookies = [
-                  '{}={}; Domain={}; expires={}; Path=/; SameSite=None; Secure'.format(cookieIdKey, cookieId, domain, expires.strftime("%a, %d %b %Y %H:%M:%S GMT")),
-                  '{}={}; Domain={}; Path=/; SameSite=None; Secure'.format(firstTimeKey, firstTime, domain),
-              ]
-              if leadId:
-                  cookies.append('{}={}; Domain={}; expires={}; Path=/; SameSite=None; Secure'.format(leadIdKey, leadId, domain, expires.strftime("%a, %d %b %Y %H:%M:%S GMT")))
-              
-              return {
-                  'statusCode': 200,
-                  'headers': {
-                      'Content-Type': 'image/gif',
-                  },
-                  'cookies': cookies,
-                  'body': 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
-                  'isBase64Encoded': True
-              }
+            print(event)
+            
+            if 'headers' in event:
+              headers = event['headers']
+
+            if 'queryStringParameters' in event:
+              queryStringParameters = event['queryStringParameters']
+                
+            visitorId = queryStringParameters.get('vid', autoGenVisitorId)
+            firstTime = queryStringParameters.get('ft', timestampNow)
+            leadId = queryStringParameters.get('lid')
+
+            data = {
+              'CookieID': visitorId,
+              'Timestamp': timestampNow,
+              'ClientSubDomain': queryStringParameters.get('cid'),
+              'leadId': leadId,
+              'url': queryStringParameters.get('p'),
+              'title': queryStringParameters.get('t'),
+              'refererUrl': queryStringParameters.get('r'),
+              'firstTime': firstTime,
+              'query': queryStringParameters.get('q'),
+              'isKeypage': queryStringParameters.get('kp'),
+              'lang': queryStringParameters.get('l'),
+
+              'UserAgent': headers.get('user-agent'),
+              'sourceIp': headers.get('x-forwarded-for'),
+            }
+                
+            queue = sqs.get_queue_by_name(QueueName=name)
+
+            response = queue.send_message(MessageBody=json.dumps(data))
+
+            return {
+              'statusCode': 200,
+              'headers': {
+                'Content-Type': 'image/gif',
+              },
+              'body': 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+              'isBase64Encoded': True
+            }
   ActionHistory001ApiGateway2SqsLambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -190,74 +172,78 @@ Resources:
           from boto3.dynamodb.conditions import Key
           from botocore.exceptions import ClientError
           import logging
-           
+          
           logger = logging.getLogger()
           logger.setLevel(logging.INFO)
-          
+
           queueName = os.environ['queueName']
           dynamodbTableName = os.environ['dynamodbTableName']
           sqs = boto3.resource("sqs")
           dynamodb = boto3.resource("dynamodb")
-          
+
           def lambda_handler(event, context):
-              print(event)
-              queue = sqs.get_queue_by_name(QueueName=queueName)
-          
-              messages = event['Records']
-          
-              entries = []
-              for message in messages:
-                  entries.append({
-                      "Id": message['messageId'],
-                      "ReceiptHandle": message['receiptHandle']
-                  })
-           
-              table = dynamodb.Table(dynamodbTableName)
-          
-              try:
-                  with table.batch_writer() as batch:
-                      for message in messages:
-                          putItem = {}
-                          itemBody = json.loads(message['body'])
-                          putItem['CookieID'] = itemBody['CookieID']
-                          putItem['Timestamp'] = itemBody['Timestamp']
-                          putItem['leadId'] = itemBody['leadId']
-                          putItem['url'] = itemBody['url']
-                          putItem['title'] = itemBody['title']
-                          putItem['refererUrl'] = itemBody['refererUrl']
-                          putItem['firstTime'] = itemBody['firstTime']
-                          putItem['UserAgent'] = itemBody['UserAgent']
-                          putItem['query'] = itemBody['query']
-                          putItem['isKeypage'] = itemBody['isKeypage']
-                          batch.put_item(Item=putItem)
-              except Exception as e:
-                  print(e)
-          
-              response = {}
-              if len(entries) != 0:
-                  response = queue.delete_messages(
-                      Entries = entries
-              )
+            print(event)
+            queue = sqs.get_queue_by_name(QueueName=queueName)
+
+            messages = event['Records']
+
+            entries = []
+            for message in messages:
+              entries.append({
+                "Id": message['messageId'],
+                "ReceiptHandle": message['receiptHandle']
+              })
               
-              print('leadId', putItem['leadId'])
-              if putItem['leadId']:
-                  try:
-                      client = boto3.client('events')
-                      put_events_response = client.put_events(
-                          Entries=[
-                              {
-                                  # 'Time': datetime(2015, 1, 1),
-                                  'Source': 'switch-plus.action-history',
-                                  'DetailType': 'pageview',
-                                  'Detail': json.dumps(putItem),
-                              },
-                          ]
-                      )
-                  except Exception as e:
-                      print(e)
-           
-              logger.info(response)
-              return response
+            table = dynamodb.Table(dynamodbTableName)
+
+            try:
+              with table.batch_writer() as batch:
+                for message in messages:
+                  putItem = {}
+                  itemBody = json.loads(message['body'])
+                  putItem['CookieID'] = itemBody['CookieID']
+                  putItem['Timestamp'] = itemBody['Timestamp']
+                  putItem['ClientSubDomain'] = itemBody['ClientSubDomain']
+                  putItem['leadId'] = itemBody['leadId']
+                  putItem['url'] = itemBody['url']
+                  putItem['title'] = itemBody['title']
+                  putItem['refererUrl'] = itemBody['refererUrl']
+                  putItem['firstTime'] = itemBody['firstTime']
+                  putItem['UserAgent'] = itemBody['UserAgent']
+                  putItem['query'] = itemBody['query']
+                  putItem['isKeypage'] = itemBody['isKeypage']
+                  putItem['lang'] = itemBody['lang']
+                  putItem['sourceIp'] = itemBody['sourceIp']
+                  print(putItem)
+                  batch.put_item(Item=putItem)
+            except Exception as e:
+              print(e)
+
+            response = {}
+            if len(entries) != 0:
+              response = queue.delete_messages(
+                Entries = entries
+              )
+                        
+            print('leadId', putItem['leadId'])
+            if putItem['leadId']:
+              try:
+                client = boto3.client('events')
+                put_events_response = client.put_events(
+                  Entries=[
+                    {
+                    # 'Time': datetime(2015, 1, 1),
+                      'Source': 'switch-plus.action-history',
+                      'DetailType': 'pageview',
+                      'Detail': json.dumps(putItem),
+                    },
+                  ]
+                )
+              except Exception as e:
+                print(e)
+                              
+            logger.info(response)
+            return response
   ActionHistory002Sqs2DynamoDBLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
