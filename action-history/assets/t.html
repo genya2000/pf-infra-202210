@@ -2,12 +2,8 @@
     <head>
         <meta name="robots" content="noindex,nofollow">
         <script>
-         /* var url = new URL(window.location.href);
-          * var params = url.searchParams;
-          * var targetOrigin = params.get('t'); */
          function receiveMessage(event) {
              var origin = event.origin;
-             // var key = 'SPDATA';
              var localStoragekeys = ['spvid', 'splid'];
              var sessionStoragekeys = ['spft'];
              var message = event.data;
@@ -27,7 +23,6 @@
                      });
                  } catch(error) {
                      data['error'] = error;
-                     // nothing
                  }
                  event.source.postMessage(data, event.origin);
                  return;
@@ -54,12 +49,9 @@
              } catch {
                  // nothing
              }
-             /* window.localStorage.setItem(key, JSON.stringify(message));
-              * window.sessionStorage.setItem(key, JSON.stringify(message)); */
              return;
          }
          
-         // Add a listener to listen for postMessage messages
          window.addEventListener('message', receiveMessage);
         </script>
     </head>

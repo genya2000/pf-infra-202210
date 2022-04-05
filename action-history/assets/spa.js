@@ -1,5 +1,6 @@
 (function() {
   'use strict';
+  var d = 'stg.switch-plus.jp';
 
   if (window.spa && window.spa.vars)  // Compatibility
 	window.spa = window.spa.vars
@@ -77,6 +78,19 @@
   }
 
 
+  window.spa.scanLink = function (vid, cid, lid) {
+    var elements = document.getElementsByTagName('a');
+    Array.prototype.forEach.call(elements, function (element) {
+      var url = new URL(element.href);
+      var result = url.toString().match(/^https?:\/{2,}(.*?)(?:\/|\?|#|$)/)[1];
+      if (result == 'r.'+d) {
+        url.searchParams.append('vid', vid);
+        url.searchParams.append('client_key', cid);
+        if (lid) url.searchParams.append('lid', lid);
+        element.href = url.toString();
+      }
+    });
+  }
   // Get URL to send to Spa.
   window.spa.url = function(vars) {
 
@@ -90,27 +104,13 @@
     var page_url = location.href;
     page_url = page_url.replace(/#.*$/,"")
 
-    // if(document.cookie){
-    //   var r = document.cookie.split(';');
-    //   r.forEach(function(value) {
-    //     var content = value.split('=');
-    //     if(content[0].trim(" ") === "spcid"){
-    //       cookie = content[1];
-    //     }
-    //     if(content[0].trim(" ") === "spft"){
-    //       firstTime = content[1];
-    //     }
-    //   })
-    // }
-
-	var data = get_data(vars || {})
-	if (data.p === null)  // null from user callback.
-	  return
-	data.rnd = Math.random().toString(36).substr(2, 5)  // Browsers don't always listen to Cache-Control.
-
-    console.log(data);
-
-	return "https://a.stg.switch-plus.jp/b.gif" + urlencode(data)
+    var data = get_data(vars || {})
+    spa.scanLink(data.vid, data.cid, data.lid);
+    if (data.p === null) {
+      return;
+    }
+    data.rnd = Math.random().toString(36).substr(2, 5)
+    return "https://a."+d+"/b.gif" + urlencode(data)
   }
 
   // Count a hit.
@@ -166,7 +166,7 @@
     }
 
     // Create iframe
-    var origin = 'https://cdn.stg.switch-plus.jp';
+    var origin = 'https://cdn.'+d;
     var el = document.createElement('iframe');
     el.src = origin + '/b/t.html';
     el.setAttribute('style', 'width:0;height:0;border:0;border:none');
