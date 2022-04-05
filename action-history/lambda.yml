@@ -66,6 +66,136 @@ Resources:
                   - logs:CreateExportTask
                   - sqs:*
                   - events:PutEvents
+  ActionHistorySes2EventBridgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${Env}-action-history-ses2eventbridge-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${Env}-action-history-ses2eventbridge-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Resource: "*"
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:CreateExportTask
+                  - events:PutEvents
+                  - sns:*
+  ActionHistorySes2EventBridgeLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Environment:
+        Variables:
+          eventSource: !Sub '${Env}.switch-plus.action-history'
+      FunctionName: !Sub ${Env}-action-history-ses2eventbridge
+      Handler: index.lambda_handler
+      Role: !GetAtt ActionHistorySes2EventBridgeRole.Arn
+      Runtime: python3.9
+      Description: !Sub '[${Env}] Put event from ses for action history'
+      Code:
+        ZipFile: |
+          import json
+          import os
+          import datetime
+          import time
+          import boto3
+          import uuid
+          import dateutil.parser
+          from urllib.parse import urlparse
+          
+          eventSource = os.environ['eventSource']
+          
+          def lambda_handler(event, context):
+              print(event)
+              message = json.loads(event['Records'][0]['Sns']['Message'])
+              
+              try:
+                  if message['eventType'] == 'Open':
+                      mail = message.get('mail')
+                      tags = mail.get('tags')
+          
+                      openAttr = message.get('open')
+
+                      putItem = {}
+                      putItem['leadId'] = tags.get('lead_uuid')[0]
+                      putItem['ClientSubDomain'] = tags.get('client_key')[0]
+                      putItem['CookieID'] = 'null'
+                      putItem['parameter'] = tags.get('mail_template_id')[0]
+                      date = dateutil.parser.parse(openAttr.get('timestamp'))
+                      putItem['firstTime'] = date.strftime("%Y-%m-%d")
+                      putItem['UserAgent'] = openAttr.get('userAgent')
+                      putItem['refererUrl'] = 'null'
+          
+                      client = boto3.client('events')
+                      put_events_response = client.put_events(
+                          Entries=[
+                              {
+                              # 'Time': datetime(2015, 1, 1),
+                                'Source': eventSource,
+                                'DetailType': 'mail:open',
+                                'Detail': json.dumps(putItem),
+                              },
+                          ]
+                      )
+                  if message['eventType'] == 'Click':
+                      mail = message.get('mail')
+                      tags = mail.get('tags')
+          
+                      clickAttr = message.get('click')
+          
+                      putItem = {}
+                      putItem['leadId'] = tags.get('lead_uuid')[0]
+                      putItem['ClientSubDomain'] = tags.get('client_key')[0]
+                      putItem['CookieID'] = 'null'
+                      putItem['parameter'] = clickAttr.get('link')
+                      date = dateutil.parser.parse(clickAttr.get('timestamp'))
+                      putItem['firstTime'] = date.strftime("%Y-%m-%d")
+                      putItem['UserAgent'] = clickAttr.get('userAgent')
+                      putItem['refererUrl'] = 'null'
+          
+                      client = boto3.client('events')
+                      put_events_response = client.put_events(
+                          Entries=[
+                              {
+                              # 'Time': datetime(2015, 1, 1),
+                                'Source': eventSource,
+                                'DetailType': 'mail:click',
+                                'Detail': json.dumps(putItem),
+                              },
+                          ]
+                      )
+              except Exception as e:
+                  print(e)
+  ActionHistorySes2EventBridgePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Sub ${ActionHistorySes2EventBridgeLambda}
+      Principal: sns.amazonaws.com
+      SourceArn: !Sub 'arn:aws:sns:ap-northeast-1:176282227532:${Env}-manual-ses-mailer-events'
+  ActionHistorySes2EventBridgeSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: lambda
+      Endpoint: !GetAtt ActionHistorySes2EventBridgeLambda.Arn
+      TopicArn: !Sub 'arn:aws:sns:ap-northeast-1:176282227532:${Env}-manual-ses-mailer-events'
+  ActionHistorySes2EventBridgeLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ActionHistorySes2EventBridgeLambda}
+      RetentionInDays: 14
   ActionHistory001ApiGateway2SqsLambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -157,6 +287,7 @@ Resources:
         Variables:
           queueName: !Sub '${Env}-action-history-save-dynamodb-queue'
           dynamodbTableName: !Sub '${Env}-switchplus-action-history'
+          eventSource: !Sub '${Env}.switch-plus.action-history'
       FunctionName: !Sub ${Env}-action-history-002-sqs2dynamodb
       Handler: index.lambda_handler
       Role: !GetAtt ActionHistory002Sqs2DynamoDBRole.Arn
@@ -172,12 +303,14 @@ Resources:
           from boto3.dynamodb.conditions import Key
           from botocore.exceptions import ClientError
           import logging
+          from datetime import date
           
           logger = logging.getLogger()
           logger.setLevel(logging.INFO)
 
           queueName = os.environ['queueName']
           dynamodbTableName = os.environ['dynamodbTableName']
+          eventSource = os.environ['eventSource']
           sqs = boto3.resource("sqs")
           dynamodb = boto3.resource("dynamodb")
 
@@ -214,7 +347,6 @@ Resources:
                   putItem['isKeypage'] = itemBody['isKeypage']
                   putItem['lang'] = itemBody['lang']
                   putItem['sourceIp'] = itemBody['sourceIp']
-                  print(putItem)
                   batch.put_item(Item=putItem)
             except Exception as e:
               print(e)
@@ -227,14 +359,21 @@ Resources:
                         
             print('leadId', putItem['leadId'])
             if putItem['leadId']:
+              if putItem['isKeypage'] is None:
+                detailType = 'pageview'
+              else:
+                detailType = 'pageview:key'
+              putItem['firstTime'] = date.fromtimestamp(int(putItem['firstTime'])).isoformat()
+              putItem['parameter'] = putItem['url']
+
               try:
                 client = boto3.client('events')
                 put_events_response = client.put_events(
                   Entries=[
                     {
                     # 'Time': datetime(2015, 1, 1),
-                      'Source': 'switch-plus.action-history',
-                      'DetailType': 'pageview',
+                      'Source': eventSource, 
+                      'DetailType': detailType,
                       'Detail': json.dumps(putItem),
                     },
                   ]
@@ -250,3 +389,31 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${ActionHistory002Sqs2DynamoDBLambda}
       RetentionInDays: 14
+  ActionHistoryEventBridgeApiDestinationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${Env}-action-history-eventbridge-api-destination-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${Env}-action-history-eventbridge-api-destination-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Resource: 
+                  - !Sub 'arn:aws:events:ap-northeast-1:176282227532:api-destination/${Env}-api-action-histories/*'
+                  - !Sub 'arn:aws:events:ap-northeast-1:176282227532:api-destination/${Env}-debug-slack/*'
+                Action:
+                  - events:InvokeApiDestination
+              - Effect: Allow
+                Resource: "*"
+                Action:
+                  - cloudtrail:*
