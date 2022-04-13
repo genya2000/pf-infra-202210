@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: API Gateway Template for Scenario
+
+Parameters:
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+
+Conditions:
+  IsStg: !Equals [!Ref Env, 'stg']
+
+Resources:
+  ScenarioExecuteStepJobsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${Env}-scenario-execute-step-jobs-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ${Env}-scenario-execute-step-jobs-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Resource: "*"
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:CreateExportTask
+  ScenarioExecuteStepJobsLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Environment:
+        Variables:
+          apiUrl: !If [
+            IsStg,
+            'https://api.stg.switch-plus.jp/api/scenario/step/jobs/execute',
+            'https://api.switch-plus.jp/api/scenario/step/jobs/execute'
+          ]
+      FunctionName: !Sub ${Env}-scenario-execute-step-jobs
+      Handler: index.lambda_handler
+      Role: !GetAtt ScenarioExecuteStepJobsRole.Arn
+      Runtime: python3.9
+      Description: !Sub '[${Env}] Execute step jobs api'
+      Code:
+        ZipFile: |
+          import boto3
+          import json
+          import re
+          import os
+          from urllib import request, parse
+          from pprint import pprint
+          apiUrl = os.environ['apiUrl']
+
+          def lambda_handler(event, context):
+              req = request.Request(apiUrl)
+              with request.urlopen(req) as res:
+                  # resは http.client.HTTPResponse
+                  body = json.loads(res.read()) # レスポンスボディ
+                  headers = res.getheaders() # ヘッダー(dict)
+                  status = res.getcode() # ステータスコード
+                  pprint(headers)
+                  pprint(status)
+                  pprint(body)
+#  ScenarioExecuteStepJobsPermission:
+#    Type: AWS::Lambda::Permission
+#    Properties:
+#      Action: lambda:InvokeFunction
+#      FunctionName: !Sub ${ScenarioExecuteStepJobsLambda}
+#      Principal: events.amazonaws.com
+#      SourceArn: !Sub 'arn:aws:events:ap-northeast-1:176282227532:rule/${Env}-exec-step-jobs'
+  ScenarioExecuteStepJobsLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ScenarioExecuteStepJobsLambda}
+      RetentionInDays: 14
