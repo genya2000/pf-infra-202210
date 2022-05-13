@@ -25,7 +25,6 @@ help:
 	@echo ''
 
 init:
-	@make git-setup
 	@make docker-setup
 lint:
 	docker run -it --rm -v ${MAKEFILE_DIR}:/var/www/workdir -w /var/www/workdir cfn-lint:latest cfn-lint ${TMPL}
