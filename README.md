@@ -3,7 +3,7 @@
 
 ## バージョン情報
 
-| docker  | aws-cli | 
+| docker  | aws-cli |
 |:--------|:--------|
 | 20.10.8 | 2.3.4   |
 
@@ -28,7 +28,7 @@
 ※aws-cliのインストールを事前に行なってください。
 
 1. AWSコンソール上で `ACCESS_KEY`,`SECRET_ACCESS_KEY` を発行する
-2. リポジトリのルートディレクトリで下記コマンド
+2. リポジトリのルートディレクトリで下記コマンドを実行する
 
     ```shell
     $ make init
@@ -41,6 +41,10 @@
     AWS_ACCESS_KEY_ID: コンソール上から作成し発行された値
     AWS_SECRET_ACCESS_KEY: コンソール上から作成し発行された値
     REGION: ap-northeast-1
+    ```
+3. Gitのローカル設定(必用に応じて実行)
+    ```sh
+    ./.make/setup_git.sh
     ```
 
 <br>
