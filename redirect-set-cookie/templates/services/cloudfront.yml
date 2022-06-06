@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CloudFront Template for Action History
+
+Parameters:
+  ServiceName:
+    Type: String
+    Default: switch_plus
+    Description: Enter service name
+
+  Env:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prod
+    Description: Enter stg or prod
+  RedirectSetCookieApiUrl:
+    Type: String
+    Description: The shared value will be passed to this parameter by parent stack.
+
+Conditions:
+  IsStg: !Equals [!Ref Env, 'stg']
+
+Resources:
+  ##### CloudFront Distribution の作成 #####
+  # ※カスタムオリジンの設定はCloudFrontでは対応していない
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html#cfn-cloudfront-distribution-distributionconfig
+  RedirectSetCookieDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !If [IsStg, 'r.stg.switch-plus.jp', 'r.switch-plus.jp']
+        Origins:
+          - Id: RedirectSetCookieApiGatewayOrigin
+            DomainName: !Ref RedirectSetCookieApiUrl
+            CustomOriginConfig:
+              OriginProtocolPolicy: match-viewer
+        Comment: !Sub '[${Env}] Record action history and http redirect Distribution'
+        Enabled: true
+        IPV6Enabled: false
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: RedirectSetCookieApiGatewayOrigin
+          # ViewerProtocolPolicy: redirect-to-https
+          #ViewerProtocolPolicy: allow-all
+          ViewerProtocolPolicy: https-only
+          DefaultTTL: 0
+          MaxTTL: 0
+          MinTTL: 0
+          AllowedMethods:
+            - GET
+            - HEAD
+          ForwardedValues:
+            QueryString: true
+            # https://oji-cloud.net/2020/12/07/post-5752/
+            # Headerは設定しない
+            Cookies:
+              Forward: whitelist
+              WhitelistedNames:
+                - SwitchPlusVID
+        PriceClass: PriceClass_200
+        ViewerCertificate:
+          SslSupportMethod: sni-only
+          AcmCertificateArn: !If [
+            IsStg,
+            !Sub 'arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/84e89707-1d47-4b58-a1e2-4bc13a214951',
+            !Sub 'arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/2092b2b3-823f-4d48-9713-04ef3b3e0944'
+          ]
+      Tags:
+        - Key: Name
+          Value: !Sub '${Env}-${ServiceName}-redirect-set-cookie-distribution'
+  DomainAssociateToActionHistoryDistribution:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: !If [IsStg, 'r.stg.switch-plus.jp', 'r.switch-plus.jp']
+      HostedZoneId: !If [IsStg, 'Z0172048P9L6ZJKXTXK', 'Z06069631TP3ZZ0V33UKJ']
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt RedirectSetCookieDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2 # 固定値 @ref https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget-1.html#cfn-route53-aliastarget-hostedzoneid
