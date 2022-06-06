@@ -4,41 +4,65 @@ import datetime
 import time
 import boto3
 import uuid
+from datetime import timedelta
+import urllib.parse as urlparse
+from urllib.parse import urlencode
 
-name = os.environ['queueName']
-sqs = boto3.resource('sqs')
-domain = '.switch-plus.jp'
-expires = datetime.datetime.utcnow() + datetime.timedelta(days=365) # expires in 365 days
-visitor_id = str(uuid.uuid4())
-timestamp = int(time.time())
+
+client = boto3.client('events')
+eventSource = os.environ['eventSource']
 
 def lambda_handler(event, context):
-    request = event['headers']
-    queryStringParameters = event['queryStringParameters']
-    # distributionId = event['Records'][0]['cf']['config']['distributionId']
-
-    data = {
-        # distributionId: distributionId,
-        'CookieID': visitor_id,
-        'Timestamp': int(time.time()),
-        'queryStringParameters': queryStringParameters,
-        'event': event
-    }
+    print(event)
+    url = event['queryStringParameters']['url']
     
-    print(json.dumps(data) )
-    print('SwitchPlusVID={}; Domain={}; expires={}; Path=/; SameSite=None; Secure'.format(visitor_id, domain, expires.strftime("%a, %d %b %Y %H:%M:%S GMT")))
-    
-    queue = sqs.get_queue_by_name(QueueName=name)
-    # メッセージ×3をキューに送信
-    response = queue.send_message(MessageBody=json.dumps(data))
+    leadUuid = None
+    clientKey = None
+    # DetailTypeを動的にしたい場合の検討
+    # if 'type' in event['queryStringParameters']:
+    #    detailType = event['queryStringParameters']['type']
+    if 'lid' in event['queryStringParameters']:
+        leadUuid = event['queryStringParameters']['lid']
+    # vidは不要
+    # if 'vid' in event['queryStringParameters']:
+    #    visitorUuid = event['queryStringParameters']['vid']
+    if 'client_key' in event['queryStringParameters']:
+        clientKey = event['queryStringParameters']['client_key']
+        
+    url_parts = list(urlparse.urlparse(url))
+    query = dict(urlparse.parse_qsl(url_parts[4]))
+    query.update({'spl': leadUuid})
+    url_parts[4] = urlencode(query)
+    print(urlparse.urlunparse(url_parts))
 
-    return {
-        # multiValueH
-        'statusCode': 200,
-        "headers": {
-            'Content-Type': 'image/gif',
-            'Set-Cookie': 'SwitchPlusVID={}; Domain={}; expires={}; Path=/; SameSite=None; Secure'.format(visitor_id, domain, expires.strftime("%a, %d %b %Y %H:%M:%S GMT"))
-        },
-        "body": "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-        "isBase64Encoded": True
+    if leadUuid and clientKey:
+        # print(putItem)
+        putItem = {}
+        putItem['leadId'] = leadUuid
+        putItem['ClientSubDomain'] = clientKey
+        putItem['CookieID'] = 'null'
+        putItem['parameter'] = url
+        dt_now = datetime.datetime.now()
+        putItem['firstTime'] = dt_now.strftime('%Y-%m-%d')
+        putItem['UserAgent'] = 'null'
+        putItem['refererUrl'] = 'null'
+    
+        putEventResponse = client.put_events(
+            Entries=[
+                {
+                    # 'Time': '2022-01-14T01:02:03Z',
+                    'Source': eventSource,
+                    'DetailType': 'mail:click',
+                    'Detail': json.dumps(putItem),
+                },
+            ]
+        )
+
+
+    response = {}
+    response["statusCode"] = 302
+    response["headers"] = {
+        'Location': urlparse.urlunparse(url_parts),
     }
+    return response
+
