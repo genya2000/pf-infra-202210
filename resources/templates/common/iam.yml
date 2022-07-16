@@ -19,6 +19,9 @@ Resources:
         ]
       }
       Description: ECS ServiceRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
 
   ECSServicePolicy:
     Type: AWS::IAM::Policy
