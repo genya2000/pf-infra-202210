@@ -75,15 +75,16 @@ Resources:
               awslogs-region: !Ref AWS::Region
               awslogs-create-group: true
               awslogs-stream-prefix: !Sub '${Env}-ecs-api'
-            #         - Name: !Sub '${Env}-api-mackerel-agent'
-            #           Image: public.ecr.aws/mackerel/mackerel-container-agent:latest
-            #           Memory: 128
-            #           Environment:
-            #             - Name: MACKEREL_CONTAINER_PLATFORM
-            #               Value: ecs_v3
-            #             - Name: MACKEREL_APIKEY
-            #               Value: 7KZotFiCz6H9A2qrytwjoRcTD4wZGxRzWcgrnZ2QnFuR
-            #           Essential: false
+        - Name: !Sub '${Env}-api-mackerel-agent'
+          Image: public.ecr.aws/mackerel/mackerel-container-agent:latest
+          Memory: 128
+          Environment:
+            - Name: MACKEREL_CONTAINER_PLATFORM
+              Value: ecs_v3
+          Secrets:
+            - Name: MACKEREL_APIKEY
+              ValueFrom: !If [IsProd, '/switch-plus/prod/mackerel-api-key', '/switch-plus/stg/mackerel-api-key']
+          Essential: false
       TaskRoleArn: arn:aws:iam::176282227532:role/ECSServiceTaskRoleForExecAccessToECS
       Tags:
         - Key: Name
