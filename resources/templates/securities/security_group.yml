@@ -114,11 +114,11 @@ Resources:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: 0.0.0.0/0 # Profuture, GizumoのIPアドレスのみにする
+          CidrIp: 0.0.0.0/0 # 必要に応じProfutureのIPアドレスのみにする
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 0.0.0.0/0 # Profuture, GizumoのIPアドレスのみにする
+          CidrIp: 0.0.0.0/0 # 必要に応じProfutureのIPアドレスのみにする
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: 80
@@ -143,7 +143,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 0.0.0.0/0 # Profuture, GizumoのIPアドレス, APIコンテナのみにする
+          CidrIp: 0.0.0.0/0 # 必要に応じProfutureのIPアドレス, APIコンテナのみにする
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: 4440
