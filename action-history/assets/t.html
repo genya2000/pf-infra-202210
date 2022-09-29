@@ -1,60 +1,54 @@
-<html>
-    <head>
-        <meta name="robots" content="noindex,nofollow">
-        <script>
-         function receiveMessage(event) {
-             var origin = event.origin;
-             var localStoragekeys = ['spvid', 'splid'];
-             var sessionStoragekeys = ['spft'];
-             var message = event.data;
+<meta name="robots" content="noindex,nofollow">
+<script>
+    function receiveMessage(event) {
+        var origin = event.origin;
+        var localStoragekeys = ['spvid', 'splid'];
+        var sessionStoragekeys = ['spft'];
+        var message = event.data;
 
-             if (message === 'get') {
-                 var data = {};
-                 try {
-                     localStoragekeys.forEach(function(key) {
-                         if ( window.localStorage.getItem(key) !== null ) {
-                             data[key] = window.localStorage.getItem(key);
-                         }
-                     });
-                     sessionStoragekeys.forEach(function(key) {
-                         if ( window.sessionStorage.getItem(key) !== null ) {
-                             data[key] = window.sessionStorage.getItem(key);
-                         }
-                     });
-                 } catch(error) {
-                     data['error'] = error;
-                 }
-                 event.source.postMessage(data, event.origin);
-                 return;
-             }
+        if (message === 'get') {
+            var data = {};
+            try {
+                localStoragekeys.forEach(function(key) {
+                    if ( window.localStorage.getItem(key) !== null ) {
+                        data[key] = window.localStorage.getItem(key);
+                    }
+                });
+                sessionStoragekeys.forEach(function(key) {
+                    if ( window.sessionStorage.getItem(key) !== null ) {
+                        data[key] = window.sessionStorage.getItem(key);
+                    }
+                });
+            } catch(error) {
+                data['error'] = error;
+            }
+            event.source.postMessage(data, event.origin);
+            return;
+        }
              
-             if ( !message.spcdomain ) {
-                 return;
-             }
-             if ( event.origin != message.spcdomain ) {
-                 return;
-             }
-             delete message.spcdomain;
+        if ( !message.spcdomain ) {
+            return;
+        }
+        if ( event.origin != message.spcdomain ) {
+            return;
+        }
+        delete message.spcdomain;
 
-             try {
-                 if ( window.localStorage.getItem('spvid') === null && message['spvid']) {
-                     window.localStorage.setItem('spvid', message['spvid']);
-                 }
-                 if ( window.localStorage.getItem('splid') === null && message['splid']) {
-                     window.localStorage.setItem('splid', message['splid']);
-                 }
-                 if ( window.sessionStorage.getItem('spft') === null && message['spft']) {
-                     window.sessionStorage.setItem('spft', message['spft']);
-                 }
-             } catch (error) {
-                 // nothing
-             }
-             return;
-         }
+        try {
+            if ( window.localStorage.getItem('spvid') === null && message['spvid']) {
+                window.localStorage.setItem('spvid', message['spvid']);
+            }
+            if ( window.localStorage.getItem('splid') === null && message['splid']) {
+                window.localStorage.setItem('splid', message['splid']);
+            }
+            if ( window.sessionStorage.getItem('spft') === null && message['spft']) {
+                window.sessionStorage.setItem('spft', message['spft']);
+            }
+        } catch (error) {
+            // nothing
+        }
+        return;
+    }
          
-         window.addEventListener('message', receiveMessage);
-        </script>
-    </head>
-    <body>
-    </body>
-</html>
+    window.addEventListener('message', receiveMessage);
+</script>
